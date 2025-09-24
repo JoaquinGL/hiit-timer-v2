@@ -30,14 +30,16 @@
 </script>
 
 <div class="workout-view">
-  <div class="timer-container">
-    <div class="timer">{formatTime(session.currentTime)}</div>
+  <div class="progress-bar-container">
     <ProgressBar {progress} />
   </div>
 
-  <div class="state-info">
-    <span class="state-label">{session.currentState}</span>
-    <span class="round-label">Round {session.currentRound}</span>
+  <div class="top-info">
+    <div class="timer">{formatTime(session.currentTime)}</div>
+    <div class="round-info">
+      <span class="state-label">{session.currentState}</span>
+      <span class="round-label">Round {session.currentRound}</span>
+    </div>
   </div>
 
   <div class="controls">
@@ -52,16 +54,29 @@
 
 <style>
   .workout-view {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    position: relative;
     width: 100%;
     height: 100%;
+    overflow: hidden; /* To contain absolutely positioned elements */
   }
 
-  .timer-container {
-    text-align: center;
+  .progress-bar-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+
+  .top-info {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    color: white; /* Assuming video background might be dark */
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
   }
 
   .timer {
@@ -69,22 +84,27 @@
     font-weight: bold;
   }
 
-  .state-info {
-    margin-top: 20px;
-    text-align: center;
+  .round-info {
+    text-align: right;
   }
 
   .state-label {
+    display: block;
     font-size: 2rem;
     text-transform: capitalize;
+    font-weight: bold;
   }
 
   .round-label {
     font-size: 1.5rem;
-    margin-top: 10px;
   }
 
   .controls {
-    margin-top: 20px;
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px;
   }
 </style>

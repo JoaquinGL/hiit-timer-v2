@@ -30,7 +30,7 @@ This document outlines the plan for building a HIIT (High-Intensity Interval Tra
 
 *   **Screens:**
     1.  **Home/Config:** A central panel for configuring workouts.
-    2.  **Workout:** A minimal, full-screen timer display with a progress bar and background image/video support.
+    2.  **Workout:** A minimal, full-screen timer display. The layout is designed to be minimalistic to allow for a video background. The progress bar is at the top, the timer is in the top-left corner, the round information is in the top-right corner, and the control buttons are centered at the bottom.
     3.  **Finished:** A summary screen with workout statistics.
 *   **State Management:** Svelte stores for workout and session state.
 *   **PWA:** Offline support, installable, and screen-wake-lock.
@@ -43,7 +43,17 @@ This document outlines the plan for building a HIIT (High-Intensity Interval Tra
 
 ## Current Plan
 
-### Phase 4: Workout Screen
+### Phase 5: Minimalist Workout Screen Redesign
+
+1.  **Redesign `m-WorkoutView.svelte`:**
+    *   The progress bar is now at the very top of the screen, spanning the full width.
+    *   The timer is positioned in the top-left corner.
+    *   The round/state information is in the top-right corner.
+    *   Control buttons (`Pause`/`Start`, `Reset`) are centered at the bottom of the screen.
+    *   The layout is managed with absolute positioning to free up the center of the screen for a potential video background.
+    *   Text has a subtle text-shadow to ensure readability over various backgrounds.
+
+### Phase 4: Workout Screen (Completed)
 
 1.  **Create `sessionStore`:** A store to manage the state of the current workout session.
 2.  **Update `m-WorkoutView`:** Implement the timer logic, progress bar, and display of the current state (work/rest, current round).
