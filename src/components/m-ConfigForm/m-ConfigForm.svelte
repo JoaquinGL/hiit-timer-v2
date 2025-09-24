@@ -12,6 +12,20 @@
     startTimer();
     appStore.set("workout");
   };
+
+  let roundNamesInputs: string[] = [];
+
+  $: {
+    if ($workoutStore.useRoundNames) {
+      roundNamesInputs = Array.from({ length: $workoutStore.rounds }, (_, i) => $workoutStore.roundNames[i] || '');
+    } else {
+      $workoutStore.roundNames = [];
+    }
+  }
+
+  const updateRoundNames = () => {
+    $workoutStore.roundNames = [...roundNamesInputs];
+  };
 </script>
 
 <PaperPanel>
@@ -37,6 +51,21 @@
       </label>
     </div>
     <DottedRule />
+    <label class="checkbox-label">
+      <input type="checkbox" bind:checked={$workoutStore.useRoundNames} />
+      <span>Name Rounds?</span>
+    </label>
+    {#if $workoutStore.useRoundNames}
+      <div class="round-names-inputs">
+        {#each Array($workoutStore.rounds) as _, i}
+          <label>
+            <span>Round {i + 1} Name</span>
+            <input type="text" bind:value={roundNamesInputs[i]} on:input={updateRoundNames} />
+          </label>
+        {/each}
+      </div>
+    {/if}
+    <DottedRule />
     <Button on:click={handleStart}>Start Workout</Button>
   </div>
 </PaperPanel>
@@ -57,6 +86,27 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+  }
+
+  .checkbox-label {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  input[type="checkbox"] {
+    width: auto;
+  }
+
+  .round-names-inputs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    max-height: 200px; /* Or any other height */
+    overflow-y: auto;
+    padding: 0.5rem;
+    border: 1px solid var(--muted);
+    border-radius: 4px;
   }
 
   input {

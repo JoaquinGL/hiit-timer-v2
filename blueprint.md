@@ -43,7 +43,14 @@ This document outlines the plan for building a HIIT (High-Intensity Interval Tra
 
 ## Current Plan
 
-### Phase 5: Minimalist Workout Screen Redesign
+### Phase 6: Named Rounds
+
+1.  **Update `workoutStore`:** Add a new `useRoundNames` boolean and a `roundNames` array to the store.
+2.  **Update `m-ConfigForm.svelte`:** Add a checkbox to enable/disable round names, and a list of text inputs to enter the names for each round.
+3.  **Update `m-WorkoutView.svelte`:** Display the current round name if it exists, otherwise display the round number.
+4.  **Update `sessionStore`:** Add a `roundName` property to the session state.
+
+### Phase 5: Minimalist Workout Screen Redesign (Completed)
 
 1.  **Redesign `m-WorkoutView.svelte`:**
     *   The progress bar is now at the very top of the screen, spanning the full width.

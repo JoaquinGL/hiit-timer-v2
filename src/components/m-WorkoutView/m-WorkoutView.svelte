@@ -11,6 +11,7 @@
   });
 
   let progress = 0;
+  let roundLabel = "";
 
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
@@ -26,6 +27,25 @@
     } else {
       progress = 0;
     }
+
+    if (session.currentState === 'work') {
+      if (workoutConfig.useRoundNames && workoutConfig.roundNames[session.currentRound - 1]) {
+        roundLabel = workoutConfig.roundNames[session.currentRound - 1];
+      } else {
+        roundLabel = `Round ${session.currentRound}`;
+      }
+    } else if (session.currentState === 'rest') {
+      const nextRound = session.currentRound;
+      if (nextRound < workoutConfig.rounds) {
+        if (workoutConfig.useRoundNames && workoutConfig.roundNames[nextRound]) {
+          roundLabel = `Next: ${workoutConfig.roundNames[nextRound]}`;
+        } else {
+          roundLabel = `Next: Round ${nextRound + 1}`;
+        }
+      } else {
+        roundLabel = 'Last Rest';
+      }
+    }
   }
 </script>
 
@@ -38,7 +58,7 @@
     <div class="timer">{formatTime(session.currentTime)}</div>
     <div class="round-info">
       <span class="state-label">{session.currentState}</span>
-      <span class="round-label">Round {session.currentRound}</span>
+      <span class="round-label">{roundLabel}</span>
     </div>
   </div>
 

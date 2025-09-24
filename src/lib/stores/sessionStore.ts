@@ -6,6 +6,7 @@ export interface SessionState {
   currentState: WorkoutState;
   currentTime: number;
   currentRound: number;
+  roundName?: string;
 }
 
 export const sessionStore = writable<SessionState>({
