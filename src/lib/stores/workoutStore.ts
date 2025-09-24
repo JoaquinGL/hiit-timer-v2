@@ -5,6 +5,8 @@ export interface WorkoutConfig {
   rounds: number;
   workTime: number;
   restTime: number;
+  useRoundNames: boolean;
+  roundNames: string[];
 }
 
 export const workoutStore = writable<WorkoutConfig>({
@@ -12,4 +14,6 @@ export const workoutStore = writable<WorkoutConfig>({
   rounds: 10,
   workTime: 30,
   restTime: 15,
+  useRoundNames: false,
+  roundNames: [],
 });
