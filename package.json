@@ -17,5 +17,8 @@
     "svelte-check": "^4.3.1",
     "typescript": "~5.8.3",
     "vite": "^7.1.7"
+  },
+  "dependencies": {
+    "pexels": "^1.4.0"
   }
 }

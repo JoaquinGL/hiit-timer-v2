@@ -43,6 +43,13 @@ This document outlines the plan for building a HIIT (High-Intensity Interval Tra
 
 ## Current Plan
 
+### Phase 7: Background Generator
+
+1.  **Update `m-ConfigForm.svelte`:** Add an optional text input for a "theme".
+2.  **Update `workoutStore`:** Add a `theme` property to the workout configuration.
+3.  **Create Pexels Service:** Implement a service to fetch images from the Pexels API.
+4.  **Update `m-WorkoutView.svelte`:** If a theme is provided, display background images from Pexels with a fade transition.
+
 ### Phase 6: Named Rounds
 
 1.  **Update `workoutStore`:** Add a new `useRoundNames` boolean and a `roundNames` array to the store.

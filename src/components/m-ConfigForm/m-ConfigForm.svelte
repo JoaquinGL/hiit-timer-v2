@@ -51,6 +51,11 @@
       </label>
     </div>
     <DottedRule />
+    <label>
+      <span>Theme (optional)</span>
+      <input type="text" bind:value={$workoutStore.theme} placeholder="e.g. 'nature, mountains'"/>
+    </label>
+    <DottedRule />
     <label class="checkbox-label">
       <input type="checkbox" bind:checked={$workoutStore.useRoundNames} />
       <span>Name Rounds?</span>
