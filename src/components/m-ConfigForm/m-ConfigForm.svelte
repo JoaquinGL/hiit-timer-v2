@@ -14,17 +14,21 @@
   };
 
   let roundNamesInputs: string[] = [];
+  let roundBackgroundsInputs: string[] = [];
 
   $: {
     if ($workoutStore.useRoundNames) {
       roundNamesInputs = Array.from({ length: $workoutStore.rounds }, (_, i) => $workoutStore.roundNames[i] || '');
+      roundBackgroundsInputs = Array.from({ length: $workoutStore.rounds }, (_, i) => $workoutStore.roundBackgrounds[i] || '');
     } else {
       $workoutStore.roundNames = [];
+      $workoutStore.roundBackgrounds = [];
     }
   }
 
-  const updateRoundNames = () => {
+  const updateRoundData = () => {
     $workoutStore.roundNames = [...roundNamesInputs];
+    $workoutStore.roundBackgrounds = [...roundBackgroundsInputs];
   };
 </script>
 
@@ -58,15 +62,21 @@
     <DottedRule />
     <label class="checkbox-label">
       <input type="checkbox" bind:checked={$workoutStore.useRoundNames} />
-      <span>Name Rounds?</span>
+      <span>Customize Rounds (Names & Backgrounds)?</span>
     </label>
     {#if $workoutStore.useRoundNames}
-      <div class="round-names-inputs">
+      <div class="round-customization-inputs">
         {#each Array($workoutStore.rounds) as _, i}
-          <label>
-            <span>Round {i + 1} Name</span>
-            <input type="text" bind:value={roundNamesInputs[i]} on:input={updateRoundNames} />
-          </label>
+          <div class="round-input-group">
+            <label>
+              <span>Round {i + 1} Name</span>
+              <input type="text" bind:value={roundNamesInputs[i]} on:input={updateRoundData} />
+            </label>
+            <label>
+              <span>Round {i + 1} Background URL</span>
+              <input type="url" bind:value={roundBackgroundsInputs[i]} on:input={updateRoundData} placeholder="https://.../image.gif"/>
+            </label>
+          </div>
         {/each}
       </div>
     {/if}
@@ -103,15 +113,22 @@
     width: auto;
   }
 
-  .round-names-inputs {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  .round-customization-inputs {
+    display: flex;
+    flex-direction: column;
     gap: 1rem;
-    max-height: 200px; /* Or any other height */
+    max-height: 250px;
     overflow-y: auto;
-    padding: 0.5rem;
+    padding: 1rem;
     border: 1px solid var(--muted);
     border-radius: 4px;
+  }
+
+  .round-input-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    align-items: end;
   }
 
   input {

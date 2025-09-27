@@ -1,16 +1,11 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
-  import { sessionStore, type SessionState } from "../../lib/stores/sessionStore";
+  import { sessionStore } from "../../lib/stores/sessionStore";
   import { timerStore, pauseTimer, startTimer, resetTimer } from "../../lib/stores/timerStore";
   import { workoutStore } from "../../lib/stores/workoutStore";
   import { getImages } from "../../lib/pexels";
   import ProgressBar from "../c-ProgressBar/c-ProgressBar.svelte";
   import Button from "../c-Button/c-Button.svelte";
-
-  let session: SessionState;
-  sessionStore.subscribe((value) => {
-    session = value;
-  });
 
   let progress = 0;
   let roundLabel = "";
@@ -24,26 +19,51 @@
   let bg2_opacity = 0;
 
   let imageChangeInterval: any;
+  let isThemeCarouselActive = false;
+
+  const setBackground = (newUrl: string) => {
+    if (bg1_url === newUrl || bg2_url === newUrl) return;
+
+    if (bg1_opacity > 0) {
+      bg2_url = newUrl;
+      bg1_opacity = 0;
+      bg2_opacity = 1;
+    } else {
+      bg1_url = newUrl;
+      bg1_opacity = 1;
+      bg2_opacity = 0;
+    }
+  };
+
+  const stopThemeCarousel = () => {
+    if (imageChangeInterval) {
+      clearInterval(imageChangeInterval);
+      imageChangeInterval = null;
+      isThemeCarouselActive = false;
+    }
+  };
+
+  const startThemeCarousel = () => {
+    if (isThemeCarouselActive || images.length === 0) return;
+    
+    isThemeCarouselActive = true;
+    setBackground(`url(${images[currentImageIndex]})`);
+
+    imageChangeInterval = setInterval(() => {
+      currentImageIndex = (currentImageIndex + 1) % images.length;
+      setBackground(`url(${images[currentImageIndex]})`);
+    }, 10000);
+  };
 
   onMount(async () => {
     if ($workoutStore.theme && $workoutStore.theme.trim() !== '') {
-      // Fetch a decent number of images for the session
-      images = await getImages($workoutStore.theme, 20); 
-      if (images.length > 0) {
-        bg1_url = `url(${images[0]})`;
-        bg1_opacity = 1;
-
-        // Start changing images every 20 seconds
-        imageChangeInterval = setInterval(changeImage, 10000);
-      }
+      images = await getImages($workoutStore.theme, 20);
     }
+    // The reactive logic below will handle the initial state.
   });
 
   onDestroy(() => {
-    // Stop the image change interval when the component is destroyed
-    if (imageChangeInterval) {
-      clearInterval(imageChangeInterval);
-    }
+    stopThemeCarousel();
   });
 
   const formatTime = (time: number) => {
@@ -52,50 +72,45 @@
     return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  const changeImage = () => {
-    if (images.length < 2) return; // We need at least two images to cycle
-
-    currentImageIndex = (currentImageIndex + 1) % images.length;
-    const nextImage = `url(${images[currentImageIndex]})`;
-
-    // Simple cross-fade logic
-    if (bg1_opacity > 0) {
-      bg2_url = nextImage;
-      bg1_opacity = 0;
-      bg2_opacity = 1;
-    } else {
-      bg1_url = nextImage;
-      bg1_opacity = 1;
-      bg2_opacity = 0;
-    }
-  };
-
+  // Main reactive block
   $: {
     const workoutConfig = $workoutStore;
+    const session = $sessionStore;
+    
+    // --- Progress Bar & Labels ---
     const totalTime = session.currentState === "work" ? workoutConfig.workTime : workoutConfig.restTime;
-    if (totalTime > 0) {
-      progress = (session.currentTime / totalTime) * 100;
-    } else {
-      progress = 0;
-    }
+    progress = totalTime > 0 ? (session.currentTime / totalTime) * 100 : 0;
 
     if (session.currentState === 'work') {
-      if (workoutConfig.useRoundNames && workoutConfig.roundNames[session.currentRound - 1]) {
-        roundLabel = workoutConfig.roundNames[session.currentRound - 1];
-      } else {
-        roundLabel = `Round ${session.currentRound}`;
-      }
+      roundLabel = (workoutConfig.useRoundNames && workoutConfig.roundNames[session.currentRound - 1]) 
+        ? workoutConfig.roundNames[session.currentRound - 1] 
+        : `Round ${session.currentRound}`;
     } else if (session.currentState === 'rest') {
       const nextRound = session.currentRound;
       if (nextRound < workoutConfig.rounds) {
-        if (workoutConfig.useRoundNames && workoutConfig.roundNames[nextRound]) {
-          roundLabel = `Next: ${workoutConfig.roundNames[nextRound]}`;
-        } else {
-          roundLabel = `Next: Round ${nextRound + 1}`;
-        }
+        roundLabel = (workoutConfig.useRoundNames && workoutConfig.roundNames[nextRound]) 
+          ? `Next: ${workoutConfig.roundNames[nextRound]}` 
+          : `Next: Round ${nextRound + 1}`;
       } else {
         roundLabel = 'Last Rest';
       }
+    }
+
+    // --- Background Logic ---
+    if (session.currentState === 'work') {
+      const roundBg = workoutConfig.roundBackgrounds && workoutConfig.roundBackgrounds[session.currentRound - 1];
+      
+      if (roundBg && roundBg.trim() !== '') {
+        // Specific background for this round
+        stopThemeCarousel();
+        setBackground(`url(${roundBg})`);
+      } else {
+        // No specific background, use theme carousel
+        startThemeCarousel();
+      }
+    } else if (session.currentState === 'rest') {
+      // For rest, always use the theme carousel
+      startThemeCarousel();
     }
   }
 
@@ -112,9 +127,9 @@
   </div>
 
   <div class="top-info">
-    <div class="timer">{formatTime(session.currentTime)}</div>
+    <div class="timer">{formatTime($sessionStore.currentTime)}</div>
     <div class="round-info">
-      <span class="state-label">{session.currentState}</span>
+      <span class="state-label">{$sessionStore.currentState}</span>
       <span class="round-label">{roundLabel}</span>
     </div>
   </div>

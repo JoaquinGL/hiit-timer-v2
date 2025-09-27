@@ -7,6 +7,7 @@ export interface WorkoutConfig {
   restTime: number;
   useRoundNames: boolean;
   roundNames: string[];
+  roundBackgrounds: string[];
   theme: string;
 }
 
@@ -17,5 +18,6 @@ export const workoutStore = writable<WorkoutConfig>({
   restTime: 15,
   useRoundNames: false,
   roundNames: [],
+  roundBackgrounds: [],
   theme: '',
 });
