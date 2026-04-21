@@ -1,21 +1,51 @@
-<button class="c-Button" on:click>
+<script lang="ts">
+  export let variant: 'primary' | 'secondary' | 'danger' = 'primary';
+</script>
+
+<button class="c-Button {variant}" on:click>
   <slot />
 </button>
 
 <style lang="scss">
   .c-Button {
-    background-color: var(--accent);
-    color: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1.25rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
     border: none;
-    padding: 1rem 2rem;
-    font-size: 1.25rem;
-    font-family: 'Bebas Neue', sans-serif;
-    border-radius: 4px;
+    border-radius: var(--radius);
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 100%;
+    box-shadow: var(--shadow);
 
-    &:hover {
-      background-color: var(--accent-2);
+    &:active {
+      transform: scale(0.96);
+    }
+
+    &.primary {
+      background: var(--accent-gradient);
+      color: white;
+      &:hover {
+        filter: brightness(1.1);
+      }
+    }
+
+    &.secondary {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      &:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+    }
+
+    &.danger {
+      background: var(--danger);
+      color: white;
     }
   }
 </style>

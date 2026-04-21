@@ -2,10 +2,8 @@
   import { workoutStore } from "../../lib/stores/workoutStore";
   import { appStore } from "../../lib/stores/appStore";
   import { resetTimer, startTimer } from "../../lib/stores/timerStore";
-  import PaperPanel from "../c-PaperPanel/c-PaperPanel.svelte";
-  import RibbonTitle from "../c-RibbonTitle/c-RibbonTitle.svelte";
-  import DottedRule from "../c-DottedRule/c-DottedRule.svelte";
   import Button from "../c-Button/c-Button.svelte";
+  import { Play, Settings2, Image as ImageIcon, ListTodo } from "lucide-svelte";
 
   const handleStart = () => {
     resetTimer();
@@ -20,9 +18,6 @@
     if ($workoutStore.useRoundNames) {
       roundNamesInputs = Array.from({ length: $workoutStore.rounds }, (_, i) => $workoutStore.roundNames[i] || '');
       roundBackgroundsInputs = Array.from({ length: $workoutStore.rounds }, (_, i) => $workoutStore.roundBackgrounds[i] || '');
-    } else {
-      $workoutStore.roundNames = [];
-      $workoutStore.roundBackgrounds = [];
     }
   }
 
@@ -32,106 +27,260 @@
   };
 </script>
 
-<PaperPanel>
-  <RibbonTitle title="HIIT Timer" />
-  <div class="config-form">
-    <label>
-      <span>Workout Name</span>
-      <input type="text" bind:value={$workoutStore.name} />
-    </label>
-    <DottedRule />
-    <div class="time-inputs">
-      <label>
-        <span>Rounds</span>
-        <input type="number" bind:value={$workoutStore.rounds} />
-      </label>
-      <label>
-        <span>Work</span>
-        <input type="number" bind:value={$workoutStore.workTime} />
-      </label>
-      <label>
-        <span>Rest</span>
-        <input type="number" bind:value={$workoutStore.restTime} />
-      </label>
+<div class="config-container">
+  <header class="header">
+    <div class="icon-badge">
+      <Settings2 size={32} />
     </div>
-    <DottedRule />
-    <label>
-      <span>Theme (optional)</span>
-      <input type="text" bind:value={$workoutStore.theme} placeholder="e.g. 'nature, mountains'"/>
-    </label>
-    <DottedRule />
-    <label class="checkbox-label">
-      <input type="checkbox" bind:checked={$workoutStore.useRoundNames} />
-      <span>Customize Rounds (Names & Backgrounds)?</span>
-    </label>
+    <h1>HIIT <span>Timer</span></h1>
+    <p>Configura tu sesión de entrenamiento</p>
+  </header>
+
+  <div class="form-card">
+    <div class="input-group">
+      <label for="workout-name">Nombre del entrenamiento</label>
+      <input id="workout-name" type="text" bind:value={$workoutStore.name} placeholder="Ej: Quema Grasa" />
+    </div>
+
+    <div class="grid-inputs">
+      <div class="input-group">
+        <label for="rounds">Rondas</label>
+        <input id="rounds" type="number" bind:value={$workoutStore.rounds} min="1" />
+      </div>
+      <div class="input-group">
+        <label for="work">Trabajo (s)</label>
+        <input id="work" type="number" bind:value={$workoutStore.workTime} min="5" />
+      </div>
+      <div class="input-group">
+        <label for="rest">Descanso (s)</label>
+        <input id="rest" type="number" bind:value={$workoutStore.restTime} min="0" />
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label for="theme">Tema visual (Pexels)</label>
+      <div class="input-with-icon">
+        <ImageIcon size={20} />
+        <input id="theme" type="text" bind:value={$workoutStore.theme} placeholder="Ej: fitness, nature, urban" />
+      </div>
+    </div>
+
+    <div class="toggle-group">
+      <label class="switch">
+        <input type="checkbox" bind:checked={$workoutStore.useRoundNames} />
+        <span class="slider"></span>
+      </label>
+      <span class="toggle-label">Personalizar rondas</span>
+    </div>
+
     {#if $workoutStore.useRoundNames}
-      <div class="round-customization-inputs">
+      <div class="rounds-list">
         {#each Array($workoutStore.rounds) as _, i}
-          <div class="round-input-group">
-            <label>
-              <span>Round {i + 1} Name</span>
-              <input type="text" bind:value={roundNamesInputs[i]} on:input={updateRoundData} />
-            </label>
-            <label>
-              <span>Round {i + 1} Background URL</span>
-              <input type="url" bind:value={roundBackgroundsInputs[i]} on:input={updateRoundData} placeholder="https://.../image.gif"/>
-            </label>
+          <div class="round-item">
+            <span class="round-number">{i + 1}</span>
+            <input type="text" bind:value={roundNamesInputs[i]} on:input={updateRoundData} placeholder="Nombre" />
+            <input type="url" bind:value={roundBackgroundsInputs[i]} on:input={updateRoundData} placeholder="URL Fondo" />
           </div>
         {/each}
       </div>
     {/if}
-    <DottedRule />
-    <Button on:click={handleStart}>Start Workout</Button>
   </div>
-</PaperPanel>
 
-<style>
-  .config-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
+  <div class="action-bar">
+    <Button on:click={handleStart}>
+      <Play size={20} fill="currentColor" />
+      Empezar Entrenamiento
+    </Button>
+  </div>
+</div>
 
-  .time-inputs {
-    display: flex;
-    gap: 1rem;
-  }
-
-  label {
-    display: flex;
-    flex-direction: column;
+<style lang="scss">
+  .config-container {
     width: 100%;
+    max-width: 500px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1.5rem;
+    overflow-y: auto;
   }
 
-  .checkbox-label {
-    flex-direction: row;
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+
+    .icon-badge {
+      width: 64px;
+      height: 64px;
+      background: var(--accent-gradient);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      box-shadow: 0 8px 20px rgba(56, 189, 248, 0.3);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin: 0;
+      letter-spacing: -1px;
+      span { color: var(--accent); }
+    }
+
+    p {
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+  }
+
+  .form-card {
+    background: var(--bg-card);
+    border-radius: 24px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 1rem;
+      color: white;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+
+      &:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+    }
+  }
+
+  .grid-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .input-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    
+    :global(svg) {
+      position: absolute;
+      left: 1rem;
+      color: var(--text-muted);
+    }
+
+    input {
+      padding-left: 3rem;
+      width: 100%;
+    }
+  }
+
+  .toggle-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0;
+  }
+
+  .toggle-label {
+    font-weight: 600;
+    color: var(--text-main);
+  }
+
+  .rounds-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+
+    &::-webkit-scrollbar { width: 4px; }
+    &::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 10px; }
+  }
+
+  .round-item {
+    display: flex;
     align-items: center;
     gap: 0.5rem;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.5rem;
+    border-radius: 12px;
+
+    .round-number {
+      width: 24px;
+      height: 24px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    input {
+      padding: 0.5rem;
+      font-size: 0.85rem;
+    }
   }
 
-  input[type="checkbox"] {
-    width: auto;
+  .action-bar {
+    margin-top: 2rem;
+    padding-bottom: 2rem;
   }
 
-  .round-customization-inputs {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    max-height: 250px;
-    overflow-y: auto;
-    padding: 1rem;
-    border: 1px solid var(--muted);
-    border-radius: 4px;
+  /* Switch Styles */
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    input { opacity: 0; width: 0; height: 0; }
   }
 
-  .round-input-group {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    align-items: end;
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #334155;
+    transition: .4s;
+    border-radius: 24px;
+
+    &:before {
+      position: absolute;
+      content: "";
+      height: 18px; width: 18px;
+      left: 3px; bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
   }
 
-  input {
-    width: 100%;
-  }
+  input:checked + .slider { background-color: var(--accent); }
+  input:checked + .slider:before { transform: translateX(20px); }
 </style>
