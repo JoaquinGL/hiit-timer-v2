@@ -76,57 +76,62 @@
     </button>
   </div>
 
-  <div class="form-card">
-    <div class="input-group">
-      <label for="workout-name">Nombre del entrenamiento</label>
-      <input id="workout-name" type="text" bind:value={$workoutStore.name} placeholder="Ej: Quema Grasa" />
-    </div>
-
-    <div class="grid-inputs">
+  <div class="form-layout">
+    <div class="form-card main-settings">
       <div class="input-group">
-        <label for="rounds">Rondas</label>
-        <input id="rounds" type="number" bind:value={$workoutStore.rounds} min="1" />
+        <label for="workout-name">Nombre del entrenamiento</label>
+        <input id="workout-name" type="text" bind:value={$workoutStore.name} placeholder="Ej: Quema Grasa" />
       </div>
-      <div class="input-group">
-        <label for="work">Training (s)</label>
-        <input id="work" type="number" bind:value={$workoutStore.workTime} min="5" />
-      </div>
-      <div class="input-group">
-        <label for="rest">Descanso (s)</label>
-        <input id="rest" type="number" bind:value={$workoutStore.restTime} min="0" />
-      </div>
-    </div>
 
-    <div class="input-group">
-      <label for="theme">Tema visual (Pexels)</label>
-      <div class="input-with-icon">
-        <ImageIcon size={20} />
-        <input id="theme" type="text" bind:value={$workoutStore.theme} placeholder="Ej: fitness, nature, urban" />
+      <div class="grid-inputs">
+        <div class="input-group">
+          <label for="rounds">Rondas</label>
+          <input id="rounds" type="number" bind:value={$workoutStore.rounds} min="1" />
+        </div>
+        <div class="input-group">
+          <label for="work">Training (s)</label>
+          <input id="work" type="number" bind:value={$workoutStore.workTime} min="5" />
+        </div>
+        <div class="input-group">
+          <label for="rest">Descanso (s)</label>
+          <input id="rest" type="number" bind:value={$workoutStore.restTime} min="0" />
+        </div>
       </div>
-    </div>
 
-    <div class="toggle-group">
-      <label class="switch">
-        <input type="checkbox" bind:checked={$workoutStore.useRoundNames} />
-        <span class="slider"></span>
-      </label>
-      <span class="toggle-label">Personalizar rondas</span>
+      <div class="input-group">
+        <label for="theme">Tema visual (Pexels)</label>
+        <div class="input-with-icon">
+          <ImageIcon size={20} />
+          <input id="theme" type="text" bind:value={$workoutStore.theme} placeholder="Ej: fitness, nature, urban" />
+        </div>
+      </div>
+
+      <div class="toggle-group">
+        <label class="switch">
+          <input type="checkbox" bind:checked={$workoutStore.useRoundNames} />
+          <span class="slider"></span>
+        </label>
+        <span class="toggle-label">Personalizar rondas</span>
+      </div>
     </div>
 
     {#if $workoutStore.useRoundNames}
-      <div class="rounds-list">
-        {#each Array($workoutStore.rounds) as _, i}
-          <div class="round-item">
-            <div class="round-header">
-              <span class="round-number">{i + 1}</span>
-              <span class="round-title">Configuración Ronda</span>
+      <div class="form-card rounds-settings">
+        <h3 class="section-title">Detalle de Rondas</h3>
+        <div class="rounds-list">
+          {#each Array($workoutStore.rounds) as _, i}
+            <div class="round-item">
+              <div class="round-header">
+                <span class="round-number">{i + 1}</span>
+                <span class="round-title">Configuración Ronda</span>
+              </div>
+              <div class="round-inputs">
+                <input type="text" bind:value={roundNamesInputs[i]} on:input={updateRoundData} placeholder="Nombre de la ronda" />
+                <input type="url" bind:value={roundBackgroundsInputs[i]} on:input={updateRoundData} placeholder="URL de imagen de fondo" />
+              </div>
             </div>
-            <div class="round-inputs">
-              <input type="text" bind:value={roundNamesInputs[i]} on:input={updateRoundData} placeholder="Nombre de la ronda" />
-              <input type="url" bind:value={roundBackgroundsInputs[i]} on:input={updateRoundData} placeholder="URL de imagen de fondo" />
-            </div>
-          </div>
-        {/each}
+          {/each}
+        </div>
       </div>
     {/if}
   </div>
@@ -142,12 +147,13 @@
 <style lang="scss">
   .config-container {
     width: 100%;
-    max-width: 500px;
+    max-width: 1000px;
     height: 100%;
     display: flex;
     flex-direction: column;
     padding: 2rem 1.25rem;
     overflow-y: auto;
+    margin: 0 auto;
   }
 
   .header {
@@ -167,7 +173,7 @@
     }
 
     h1 {
-      font-size: 2.5rem;
+      font-size: clamp(2rem, 5vw, 3rem);
       font-weight: 800;
       margin: 0;
       letter-spacing: -1px;
@@ -217,6 +223,18 @@
     }
   }
 
+  .form-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    width: 100%;
+
+    @media (min-width: 800px) {
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+    }
+  }
+
   .form-card {
     background: var(--bg-card);
     border-radius: 24px;
@@ -226,6 +244,23 @@
     gap: 1.75rem;
     border: 1px solid rgba(255, 255, 255, 0.05);
     box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    height: 100%;
+
+    &.main-settings {
+      @media (min-width: 800px) {
+        position: sticky;
+        top: 0;
+      }
+    }
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin: 0;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
 
   .input-group {
@@ -249,6 +284,7 @@
       color: white;
       font-size: 1rem;
       transition: all 0.2s;
+      width: 100%;
 
       &:focus {
         outline: none;
@@ -302,10 +338,9 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    max-height: 300px;
+    max-height: 500px;
     overflow-y: auto;
     padding-right: 0.5rem;
-    margin-top: 0.5rem;
 
     &::-webkit-scrollbar { width: 4px; }
     &::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 10px; }
@@ -361,6 +396,10 @@
   .action-bar {
     margin-top: 2rem;
     padding-bottom: 2rem;
+    width: 100%;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   /* Switch Styles */
