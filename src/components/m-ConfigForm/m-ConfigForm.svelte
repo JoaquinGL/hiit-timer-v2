@@ -1,14 +1,43 @@
 <script lang="ts">
-  import { workoutStore } from "../../lib/stores/workoutStore";
+  import { workoutStore, defaultWorkout } from "../../lib/stores/workoutStore";
   import { appStore } from "../../lib/stores/appStore";
   import { resetTimer, startTimer } from "../../lib/stores/timerStore";
+  import { encodeWorkout, copyToClipboard } from "../../lib/utils";
   import Button from "../c-Button/c-Button.svelte";
-  import { Play, Settings2, Image as ImageIcon } from "lucide-svelte";
+  import { Play, Settings2, Image as ImageIcon, Share2, Trash2 } from "lucide-svelte";
 
   const handleStart = () => {
     resetTimer();
     startTimer();
     appStore.set("workout");
+  };
+
+  const handleCleanAll = () => {
+    if (confirm("¿Estás seguro de que quieres limpiar toda la configuración?")) {
+      workoutStore.set({ ...defaultWorkout });
+    }
+  };
+
+  const handleShare = async () => {
+    const encoded = encodeWorkout($workoutStore);
+    const shareUrl = `${window.location.origin}${window.location.pathname}?w=${encoded}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Entrenamiento HIIT: ${$workoutStore.name}`,
+          text: `¡Mira este entrenamiento que he configurado!`,
+          url: shareUrl,
+        });
+      } catch (err) {
+        console.log('Error sharing', err);
+      }
+    } else {
+      const success = await copyToClipboard(shareUrl);
+      if (success) {
+        alert("¡Enlace copiado al portapapeles!");
+      }
+    }
   };
 
   let roundNamesInputs: string[] = [];
@@ -35,6 +64,17 @@
     <h1>HIIT <span>Timer</span></h1>
     <p>Configura tu sesión de entrenamiento</p>
   </header>
+
+  <div class="utility-actions">
+    <button class="util-btn share" on:click={handleShare} title="Compartir entrenamiento">
+      <Share2 size={18} />
+      Compartir
+    </button>
+    <button class="util-btn clean" on:click={handleCleanAll} title="Limpiar todo">
+      <Trash2 size={18} />
+      Limpiar todo
+    </button>
+  </div>
 
   <div class="form-card">
     <div class="input-group">
@@ -112,7 +152,7 @@
 
   .header {
     text-align: center;
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.5rem;
 
     .icon-badge {
       width: 64px;
@@ -137,6 +177,43 @@
     p {
       color: var(--text-muted);
       margin-top: 0.5rem;
+    }
+  }
+
+  .utility-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
+    .util-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      padding: 0.6rem 1rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+      }
+
+      &.share:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      &.clean:hover {
+        border-color: var(--danger);
+        color: var(--danger);
+      }
     }
   }
 

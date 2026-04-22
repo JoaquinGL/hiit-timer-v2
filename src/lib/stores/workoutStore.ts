@@ -11,8 +11,8 @@ export interface WorkoutConfig {
   theme: string;
 }
 
-export const workoutStore = writable<WorkoutConfig>({
-  name: 'My HIIT Workout',
+export const defaultWorkout: WorkoutConfig = {
+  name: '',
   rounds: 10,
   workTime: 30,
   restTime: 15,
@@ -20,4 +20,6 @@ export const workoutStore = writable<WorkoutConfig>({
   roundNames: [],
   roundBackgrounds: [],
   theme: '',
-});
+};
+
+export const workoutStore = writable<WorkoutConfig>({ ...defaultWorkout, name: 'My HIIT Workout' });
