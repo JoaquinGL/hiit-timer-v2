@@ -1,10 +1,11 @@
 <script lang="ts">
   import { workoutStore, defaultWorkout } from "../../lib/stores/workoutStore";
   import { appStore } from "../../lib/stores/appStore";
+  import { languageStore, t } from "../../lib/stores/i18nStore";
   import { resetTimer, startTimer } from "../../lib/stores/timerStore";
   import { encodeWorkout, copyToClipboard } from "../../lib/utils";
   import Button from "../c-Button/c-Button.svelte";
-  import { Play, Settings2, Image as ImageIcon, Share2, Trash2 } from "lucide-svelte";
+  import { Play, Settings2, Image as ImageIcon, Share2, Trash2, Languages } from "lucide-svelte";
 
   const handleStart = () => {
     resetTimer();
@@ -13,9 +14,13 @@
   };
 
   const handleCleanAll = () => {
-    if (confirm("¿Estás seguro de que quieres limpiar toda la configuración?")) {
+    if (confirm($t.confirmClean)) {
       workoutStore.set({ ...defaultWorkout });
     }
+  };
+
+  const toggleLanguage = () => {
+    languageStore.update(l => l === 'es' ? 'en' : 'es');
   };
 
   const handleShare = async () => {
@@ -25,8 +30,8 @@
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Entrenamiento HIIT: ${$workoutStore.name}`,
-          text: `¡Mira este entrenamiento que he configurado!`,
+          title: `HIIT Timer: ${$workoutStore.name}`,
+          text: $t.subtitle,
           url: shareUrl,
         });
       } catch (err) {
@@ -35,7 +40,7 @@
     } else {
       const success = await copyToClipboard(shareUrl);
       if (success) {
-        alert("¡Enlace copiado al portapapeles!");
+        alert($t.copied);
       }
     }
   };
@@ -62,23 +67,27 @@
       <Settings2 size={32} />
     </div>
     <h1>HIIT <span>Timer</span></h1>
-    <p>Configura tu sesión de entrenamiento</p>
+    <p>{$t.subtitle}</p>
   </header>
 
   <div class="utility-actions">
-    <button class="util-btn share" on:click={handleShare} title="Compartir entrenamiento">
-      <Share2 size={18} />
-      Compartir
+    <button class="util-btn lang" on:click={toggleLanguage} title="Cambiar idioma">
+      <Languages size={18} />
+      {$languageStore === 'es' ? 'English' : 'Español'}
     </button>
-    <button class="util-btn clean" on:click={handleCleanAll} title="Limpiar todo">
+    <button class="util-btn share" on:click={handleShare} title={$t.share}>
+      <Share2 size={18} />
+      {$t.share}
+    </button>
+    <button class="util-btn clean" on:click={handleCleanAll} title={$t.clean}>
       <Trash2 size={18} />
-      Limpiar todo
+      {$t.clean}
     </button>
   </div>
 
   <div class="main-card">
     <div class="input-group centered name-input">
-      <label for="workout-name">Nombre del entrenamiento</label>
+      <label for="workout-name">{$t.workoutName}</label>
       <input 
         id="workout-name" 
         type="text" 
@@ -89,21 +98,21 @@
 
     <div class="grid-inputs">
       <div class="input-group">
-        <label for="rounds">Rondas</label>
+        <label for="rounds">{$t.rounds}</label>
         <input id="rounds" type="number" bind:value={$workoutStore.rounds} min="1" />
       </div>
       <div class="input-group">
-        <label for="work">Training (s)</label>
+        <label for="work">{$t.training}</label>
         <input id="work" type="number" bind:value={$workoutStore.workTime} min="5" />
       </div>
       <div class="input-group">
-        <label for="rest">Descanso (s)</label>
+        <label for="rest">{$t.rest}</label>
         <input id="rest" type="number" bind:value={$workoutStore.restTime} min="0" />
       </div>
     </div>
 
     <div class="input-group">
-      <label for="theme">Tema visual (Pexels)</label>
+      <label for="theme">{$t.theme}</label>
       <div class="input-with-icon">
         <ImageIcon size={20} />
         <input id="theme" type="text" bind:value={$workoutStore.theme} placeholder="Ej: fitness, nature, urban" />
@@ -115,22 +124,22 @@
         <input type="checkbox" bind:checked={$workoutStore.useRoundNames} />
         <span class="slider"></span>
       </label>
-      <span class="toggle-label">Personalizar rondas</span>
+      <span class="toggle-label">{$t.customizeRounds}</span>
     </div>
 
     {#if $workoutStore.useRoundNames}
       <div class="rounds-divider"></div>
-      <h3 class="section-title">Detalle de Rondas</h3>
+      <h3 class="section-title">{$t.roundDetail}</h3>
       <div class="rounds-list">
         {#each Array($workoutStore.rounds) as _, i}
           <div class="round-item">
             <div class="round-header">
               <span class="round-number">{i + 1}</span>
-              <span class="round-title">Configuración Ronda</span>
+              <span class="round-title">{$t.roundConfig}</span>
             </div>
             <div class="round-inputs">
-              <input type="text" bind:value={roundNamesInputs[i]} on:input={updateRoundData} placeholder="Nombre de la ronda" />
-              <input type="url" bind:value={roundBackgroundsInputs[i]} on:input={updateRoundData} placeholder="URL de imagen de fondo" />
+              <input type="text" bind:value={roundNamesInputs[i]} on:input={updateRoundData} placeholder={$t.roundNamePlaceholder} />
+              <input type="url" bind:value={roundBackgroundsInputs[i]} on:input={updateRoundData} placeholder={$t.roundImagePlaceholder} />
             </div>
           </div>
         {/each}
@@ -141,7 +150,7 @@
   <div class="action-bar">
     <Button on:click={handleStart}>
       <Play size={20} fill="currentColor" />
-      Empezar Entrenamiento
+      {$t.startButton}
     </Button>
   </div>
 </div>
@@ -154,7 +163,6 @@
     flex-direction: column;
     padding: 2rem 1.25rem;
     margin: 0 auto;
-    /* Eliminamos height: 100% y overflow-y: auto */
   }
 
   .header {
@@ -190,7 +198,8 @@
   .utility-actions {
     display: flex;
     justify-content: center;
-    gap: 1rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
     margin-bottom: 2rem;
 
     .util-btn {
@@ -210,6 +219,11 @@
       &:hover {
         background: rgba(255, 255, 255, 0.1);
         color: white;
+      }
+
+      &.lang:hover {
+        border-color: var(--accent);
+        color: var(--accent);
       }
 
       &.share:hover {
@@ -348,7 +362,6 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    /* Eliminamos max-height y overflow-y para que el scroll sea global */
     padding-right: 0;
   }
 

@@ -3,6 +3,7 @@
   import { sessionStore } from "../../lib/stores/sessionStore";
   import { timerStore, pauseTimer, startTimer, resetTimer } from "../../lib/stores/timerStore";
   import { workoutStore } from "../../lib/stores/workoutStore";
+  import { t } from "../../lib/stores/i18nStore";
   import { getImages } from "../../lib/pexels";
   import ProgressBar from "../c-ProgressBar/c-ProgressBar.svelte";
   import { Pause, Play, RotateCcw, Zap, Coffee } from "lucide-svelte";
@@ -76,7 +77,7 @@
     if (session.currentState === 'work') {
       roundLabel = (workoutConfig.useRoundNames && workoutConfig.roundNames[session.currentRound - 1]) 
         ? workoutConfig.roundNames[session.currentRound - 1] 
-        : `Ronda ${session.currentRound}`;
+        : `${$t.rounds} ${session.currentRound}`;
       
       const roundBg = workoutConfig.roundBackgrounds && workoutConfig.roundBackgrounds[session.currentRound - 1];
       if (roundBg && roundBg.trim() !== '') {
@@ -87,7 +88,7 @@
       }
     } else {
       const nextRound = session.currentRound;
-      roundLabel = nextRound < workoutConfig.rounds ? "Prepárate..." : "Último descanso";
+      roundLabel = nextRound < workoutConfig.rounds ? $t.prepare : $t.lastRest;
       startThemeCarousel();
     }
   }
@@ -106,10 +107,10 @@
     <div class="status-badge" class:work={$sessionStore.currentState === 'work'}>
       {#if $sessionStore.currentState === 'work'}
         <Zap size={16} fill="currentColor" />
-        TRAINING
+        {$t.trainingBadge}
       {:else}
         <Coffee size={16} fill="currentColor" />
-        DESCANSO
+        {$t.restBadge}
       {/if}
     </div>
 

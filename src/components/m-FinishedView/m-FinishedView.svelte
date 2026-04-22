@@ -1,6 +1,7 @@
 <script lang="ts">
   import { appStore } from "../../lib/stores/appStore";
   import { workoutStore } from "../../lib/stores/workoutStore";
+  import { t } from "../../lib/stores/i18nStore";
   import Button from "../c-Button/c-Button.svelte";
   import { Trophy, Home } from "lucide-svelte";
 </script>
@@ -10,23 +11,23 @@
     <div class="trophy-icon">
       <Trophy size={64} />
     </div>
-    <h2>¡Entrenamiento Completado!</h2>
-    <p>Has terminado con éxito la sesión <strong>{$workoutStore.name}</strong>.</p>
+    <h2>{$t.finishedTitle}</h2>
+    <p>{$t.finishedSub} <strong>{$workoutStore.name}</strong>.</p>
     
     <div class="stats">
       <div class="stat-item">
-        <span class="label">Rondas</span>
+        <span class="label">{$t.statsRounds}</span>
         <span class="value">{$workoutStore.rounds}</span>
       </div>
       <div class="stat-item">
-        <span class="label">Tiempo Total</span>
+        <span class="label">{$t.statsTotalTime}</span>
         <span class="value">{Math.floor(($workoutStore.workTime + $workoutStore.restTime) * $workoutStore.rounds / 60)} min</span>
       </div>
     </div>
 
     <Button on:click={() => appStore.set("config")}>
       <Home size={20} />
-      Volver al Inicio
+      {$t.backHome}
     </Button>
   </div>
 </div>
