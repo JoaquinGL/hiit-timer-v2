@@ -18,16 +18,18 @@
 }
 
 html, body {
-  height: 100%;
+  min-height: 100%;
   margin: 0;
   background-color: var(--bg-main);
   color: var(--text-main);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  overflow: hidden;
+  /* Eliminamos overflow: hidden para permitir el scroll nativo */
 }
 
 #app {
-  height: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 input, button {

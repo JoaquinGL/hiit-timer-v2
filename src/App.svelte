@@ -19,14 +19,13 @@
       const decoded = decodeWorkout(sharedData);
       if (decoded) {
         workoutStore.set(decoded);
-        // Limpiamos la URL para que no se quede el churro de datos
         window.history.replaceState({}, document.title, window.location.pathname);
       }
     }
   });
 </script>
 
-<main>
+<main class:is-workout={screen === 'workout'}>
   {#if screen === "config"}
     <ConfigForm />
   {:else if screen === "workout"}
@@ -40,8 +39,15 @@
   main {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Alineamos al inicio para que el scroll empiece arriba */
     width: 100%;
-    height: 100%;
+    min-height: 100vh;
+  }
+
+  /* En el modo entrenamiento sí queremos que ocupe toda la pantalla sin scroll */
+  main.is-workout {
+    height: 100vh;
+    overflow: hidden;
+    align-items: center;
   }
 </style>

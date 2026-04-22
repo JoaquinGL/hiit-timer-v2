@@ -150,12 +150,11 @@
   .config-container {
     width: 100%;
     max-width: 700px;
-    height: 100%;
     display: flex;
     flex-direction: column;
     padding: 2rem 1.25rem;
-    overflow-y: auto;
     margin: 0 auto;
+    /* Eliminamos height: 100% y overflow-y: auto */
   }
 
   .header {
@@ -349,12 +348,8 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    max-height: 400px;
-    overflow-y: auto;
-    padding-right: 0.5rem;
-
-    &::-webkit-scrollbar { width: 4px; }
-    &::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 10px; }
+    /* Eliminamos max-height y overflow-y para que el scroll sea global */
+    padding-right: 0;
   }
 
   .round-item {
