@@ -5,7 +5,6 @@
   import { workoutStore } from "../../lib/stores/workoutStore";
   import { getImages } from "../../lib/pexels";
   import ProgressBar from "../c-ProgressBar/c-ProgressBar.svelte";
-  import Button from "../c-Button/c-Button.svelte";
   import { Pause, Play, RotateCcw, Zap, Coffee } from "lucide-svelte";
 
   let progress = 0;
@@ -107,7 +106,7 @@
     <div class="status-badge" class:work={$sessionStore.currentState === 'work'}>
       {#if $sessionStore.currentState === 'work'}
         <Zap size={16} fill="currentColor" />
-        TRABAJO
+        TRAINING
       {:else}
         <Coffee size={16} fill="currentColor" />
         DESCANSO
@@ -185,20 +184,20 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 2rem;
+    padding: 2rem 1.5rem;
   }
 
   .status-badge {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 1rem;
+    padding: 0.6rem 1.2rem;
     background: var(--rest);
     border-radius: 100px;
     font-weight: 800;
     font-size: 0.85rem;
-    letter-spacing: 1px;
-    margin-bottom: 1rem;
+    letter-spacing: 1.5px;
+    margin-bottom: 1.5rem;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 
     &.work {
@@ -207,12 +206,14 @@
   }
 
   .timer-display {
-    font-size: 8rem;
+    font-size: clamp(4.5rem, 22vw, 8.5rem);
     font-weight: 800;
     font-variant-numeric: tabular-nums;
     line-height: 1;
-    margin-bottom: 1rem;
-    text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    margin-bottom: 1.5rem;
+    text-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    width: 100%;
+    padding: 0 1rem;
   }
 
   .round-display {
@@ -221,6 +222,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    max-width: 90%;
 
     .round-count {
       font-size: 1rem;
@@ -232,7 +234,7 @@
   .controls-bar {
     position: relative;
     z-index: 10;
-    padding: 2rem;
+    padding: 2.5rem 2rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -240,8 +242,8 @@
   }
 
   .play-pause-btn {
-    width: 80px;
-    height: 80px;
+    width: 84px;
+    height: 84px;
     border-radius: 50%;
     background: white;
     color: black;
@@ -257,10 +259,10 @@
   }
 
   .icon-btn {
-    width: 50px;
-    height: 50px;
+    width: 54px;
+    height: 54px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     color: white;
     border: 1px solid rgba(255, 255, 255, 0.2);
     display: flex;
@@ -270,5 +272,5 @@
     backdrop-filter: blur(10px);
   }
 
-  .spacer { width: 50px; } /* To balance the reset button */
+  .spacer { width: 54px; }
 </style>

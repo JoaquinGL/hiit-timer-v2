@@ -3,7 +3,7 @@
   import { appStore } from "../../lib/stores/appStore";
   import { resetTimer, startTimer } from "../../lib/stores/timerStore";
   import Button from "../c-Button/c-Button.svelte";
-  import { Play, Settings2, Image as ImageIcon, ListTodo } from "lucide-svelte";
+  import { Play, Settings2, Image as ImageIcon } from "lucide-svelte";
 
   const handleStart = () => {
     resetTimer();
@@ -48,7 +48,7 @@
         <input id="rounds" type="number" bind:value={$workoutStore.rounds} min="1" />
       </div>
       <div class="input-group">
-        <label for="work">Trabajo (s)</label>
+        <label for="work">Training (s)</label>
         <input id="work" type="number" bind:value={$workoutStore.workTime} min="5" />
       </div>
       <div class="input-group">
@@ -77,9 +77,14 @@
       <div class="rounds-list">
         {#each Array($workoutStore.rounds) as _, i}
           <div class="round-item">
-            <span class="round-number">{i + 1}</span>
-            <input type="text" bind:value={roundNamesInputs[i]} on:input={updateRoundData} placeholder="Nombre" />
-            <input type="url" bind:value={roundBackgroundsInputs[i]} on:input={updateRoundData} placeholder="URL Fondo" />
+            <div class="round-header">
+              <span class="round-number">{i + 1}</span>
+              <span class="round-title">Configuración Ronda</span>
+            </div>
+            <div class="round-inputs">
+              <input type="text" bind:value={roundNamesInputs[i]} on:input={updateRoundData} placeholder="Nombre de la ronda" />
+              <input type="url" bind:value={roundBackgroundsInputs[i]} on:input={updateRoundData} placeholder="URL de imagen de fondo" />
+            </div>
           </div>
         {/each}
       </div>
@@ -101,7 +106,7 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 2rem 1.5rem;
+    padding: 2rem 1.25rem;
     overflow-y: auto;
   }
 
@@ -138,46 +143,53 @@
   .form-card {
     background: var(--bg-card);
     border-radius: 24px;
-    padding: 1.5rem;
+    padding: 2rem 1.5rem;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1.75rem;
     border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
   }
 
   .input-group {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.6rem;
 
     label {
-      font-size: 0.85rem;
-      font-weight: 600;
+      font-size: 0.8rem;
+      font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.8px;
     }
 
     input {
-      background: rgba(15, 23, 42, 0.5);
+      background: rgba(15, 23, 42, 0.6);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      padding: 1rem;
+      border-radius: 14px;
+      padding: 1.1rem;
       color: white;
       font-size: 1rem;
-      transition: border-color 0.2s;
+      transition: all 0.2s;
 
       &:focus {
         outline: none;
         border-color: var(--accent);
+        background: rgba(15, 23, 42, 0.8);
       }
     }
   }
 
   .grid-inputs {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 1rem;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+
+    @media (min-width: 400px) {
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+    }
   }
 
   .input-with-icon {
@@ -212,10 +224,11 @@
   .rounds-list {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-    max-height: 200px;
+    gap: 1rem;
+    max-height: 300px;
     overflow-y: auto;
     padding-right: 0.5rem;
+    margin-top: 0.5rem;
 
     &::-webkit-scrollbar { width: 4px; }
     &::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 10px; }
@@ -223,28 +236,48 @@
 
   .round-item {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: rgba(0, 0, 0, 0.2);
-    padding: 0.5rem;
-    border-radius: 12px;
+    flex-direction: column;
+    gap: 0.75rem;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 1rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+
+    .round-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
 
     .round-number {
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
       background: var(--accent);
-      border-radius: 50%;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.75rem;
-      font-weight: bold;
+      font-size: 0.85rem;
+      font-weight: 800;
       flex-shrink: 0;
     }
 
-    input {
-      padding: 0.5rem;
+    .round-title {
       font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .round-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      input {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+        border-radius: 10px;
+      }
     }
   }
 
