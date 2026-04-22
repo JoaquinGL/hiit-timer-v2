@@ -76,22 +76,22 @@
     </button>
   </div>
 
-  <section class="name-section">
-    <div class="name-card">
-      <div class="input-group centered">
-        <label for="workout-name">Nombre del entrenamiento</label>
-        <input 
-          id="workout-name" 
-          type="text" 
-          bind:value={$workoutStore.name} 
-          placeholder="Ej: Quema Grasa" 
-        />
+  <div class="main-form-wrapper">
+    <section class="name-section">
+      <div class="name-card">
+        <div class="input-group centered">
+          <label for="workout-name">Nombre del entrenamiento</label>
+          <input 
+            id="workout-name" 
+            type="text" 
+            bind:value={$workoutStore.name} 
+            placeholder="Ej: Quema Grasa" 
+          />
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <div class="form-layout">
-    <div class="form-card main-settings">
+    <div class="form-card">
       <h3 class="section-title">Ajustes Generales</h3>
       
       <div class="grid-inputs">
@@ -124,10 +124,9 @@
         </label>
         <span class="toggle-label">Personalizar rondas</span>
       </div>
-    </div>
 
-    {#if $workoutStore.useRoundNames}
-      <div class="form-card rounds-settings">
+      {#if $workoutStore.useRoundNames}
+        <div class="rounds-divider"></div>
         <h3 class="section-title">Detalle de Rondas</h3>
         <div class="rounds-list">
           {#each Array($workoutStore.rounds) as _, i}
@@ -143,8 +142,8 @@
             </div>
           {/each}
         </div>
-      </div>
-    {/if}
+      {/if}
+    </div>
   </div>
 
   <div class="action-bar">
@@ -158,7 +157,7 @@
 <style lang="scss">
   .config-container {
     width: 100%;
-    max-width: 1000px;
+    max-width: 800px;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -234,16 +233,21 @@
     }
   }
 
+  .main-form-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+  }
+
   .name-section {
     width: 100%;
     display: flex;
     justify-content: center;
-    margin-bottom: 2rem;
   }
 
   .name-card {
     width: 100%;
-    max-width: 600px;
     background: var(--bg-card);
     border-radius: 24px;
     padding: 2rem;
@@ -270,18 +274,6 @@
     }
   }
 
-  .form-layout {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-    width: 100%;
-
-    @media (min-width: 800px) {
-      grid-template-columns: 1fr 1fr;
-      align-items: start;
-    }
-  }
-
   .form-card {
     background: var(--bg-card);
     border-radius: 24px;
@@ -291,14 +283,6 @@
     gap: 1.75rem;
     border: 1px solid rgba(255, 255, 255, 0.05);
     box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-    height: 100%;
-
-    &.main-settings {
-      @media (min-width: 800px) {
-        position: sticky;
-        top: 1rem;
-      }
-    }
   }
 
   .section-title {
@@ -308,6 +292,7 @@
     color: var(--accent);
     text-transform: uppercase;
     letter-spacing: 1px;
+    text-align: center;
   }
 
   .input-group {
@@ -372,6 +357,7 @@
   .toggle-group {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 1rem;
     padding: 0.5rem 0;
   }
@@ -379,6 +365,12 @@
   .toggle-label {
     font-weight: 600;
     color: var(--text-main);
+  }
+
+  .rounds-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 0.5rem 0;
   }
 
   .rounds-list {
