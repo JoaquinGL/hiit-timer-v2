@@ -86,7 +86,7 @@
   </div>
 
   <div class="main-card">
-    <div class="input-group centered name-input">
+    <div class="input-group name-input">
       <label for="workout-name">{$t.workoutName}</label>
       <input 
         id="workout-name" 
@@ -254,7 +254,7 @@
     margin-bottom: 0.5rem;
     
     input {
-      text-align: center;
+      text-align: left;
       font-size: 1.5rem;
       font-weight: 800;
       background: rgba(0, 0, 0, 0.2) !important;
@@ -289,7 +289,7 @@
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.8px;
-      text-align: center;
+      text-align: left;
     }
 
     input {
