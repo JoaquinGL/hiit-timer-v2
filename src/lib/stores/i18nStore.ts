@@ -9,6 +9,8 @@ const translations = {
     subtitle: "Configura tu sesión de entrenamiento",
     share: "Compartir",
     clean: "Limpiar todo",
+    save: "Guardar",
+    load: "Cargar",
     workoutName: "Nombre del entrenamiento",
     rounds: "Rondas",
     training: "Training (s)",
@@ -30,12 +32,20 @@ const translations = {
     statsTotalTime: "Tiempo Total",
     backHome: "Volver al Inicio",
     confirmClean: "¿Estás seguro de que quieres limpiar toda la configuración?",
-    copied: "¡Enlace copiado al portapapeles!"
+    copied: "¡Enlace copiado al portapapeles!",
+    savedWorkouts: "Entrenamientos Guardados",
+    noSavedWorkouts: "No tienes entrenamientos guardados",
+    maxReached: "Límite de 5 entrenamientos alcanzado",
+    deleteConfirm: "¿Eliminar este entrenamiento?",
+    workoutSaved: "¡Entrenamiento guardado!",
+    unnamedWorkout: "Entrenamiento sin nombre"
   },
   en: {
     subtitle: "Configure your workout session",
     share: "Share",
     clean: "Clear all",
+    save: "Save",
+    load: "Load",
     workoutName: "Workout Name",
     rounds: "Rounds",
     training: "Training (s)",
@@ -57,7 +67,13 @@ const translations = {
     statsTotalTime: "Total Time",
     backHome: "Back to Home",
     confirmClean: "Are you sure you want to clear all settings?",
-    copied: "Link copied to clipboard!"
+    copied: "Link copied to clipboard!",
+    savedWorkouts: "Saved Workouts",
+    noSavedWorkouts: "No saved workouts",
+    maxReached: "Limit of 5 workouts reached",
+    deleteConfirm: "Delete this workout?",
+    workoutSaved: "Workout saved!",
+    unnamedWorkout: "Unnamed Workout"
   }
 };
 

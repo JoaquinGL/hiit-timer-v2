@@ -1,11 +1,15 @@
 <script lang="ts">
-  import { workoutStore, defaultWorkout } from "../../lib/stores/workoutStore";
+  import { workoutStore, defaultWorkout, type WorkoutConfig } from "../../lib/stores/workoutStore";
   import { appStore } from "../../lib/stores/appStore";
   import { languageStore, t } from "../../lib/stores/i18nStore";
+  import { savedWorkoutsStore, saveWorkout, deleteWorkout } from "../../lib/stores/savedWorkoutsStore";
   import { resetTimer, startTimer } from "../../lib/stores/timerStore";
   import { encodeWorkout, copyToClipboard } from "../../lib/utils";
   import Button from "../c-Button/c-Button.svelte";
-  import { Play, Settings2, Image as ImageIcon, Share2, Trash2, Languages } from "lucide-svelte";
+  import Modal from "../c-Modal/c-Modal.svelte";
+  import { Play, Settings2, Image as ImageIcon, Share2, Trash2, Languages, Save, FolderOpen, Trash } from "lucide-svelte";
+
+  let showLoadModal = false;
 
   const handleStart = () => {
     resetTimer();
@@ -21,6 +25,31 @@
 
   const toggleLanguage = () => {
     languageStore.update(l => l === 'es' ? 'en' : 'es');
+  };
+
+  const handleSave = () => {
+    const config = { ...$workoutStore };
+    if (!config.name.trim()) {
+      config.name = $t.unnamedWorkout;
+    }
+    
+    const success = saveWorkout(config);
+    if (success) {
+      alert($t.workoutSaved);
+    } else {
+      alert($t.maxReached);
+    }
+  };
+
+  const handleLoad = (workout: WorkoutConfig) => {
+    workoutStore.set(JSON.parse(JSON.stringify(workout)));
+    showLoadModal = false;
+  };
+
+  const handleDeleteSaved = (index: number) => {
+    if (confirm($t.deleteConfirm)) {
+      deleteWorkout(index);
+    }
   };
 
   const handleShare = async () => {
@@ -78,6 +107,14 @@
     <button class="util-btn share" on:click={handleShare} title={$t.share}>
       <Share2 size={18} />
       {$t.share}
+    </button>
+    <button class="util-btn save" on:click={handleSave} title={$t.save}>
+      <Save size={18} />
+      {$t.save}
+    </button>
+    <button class="util-btn load" on:click={() => showLoadModal = true} title={$t.load}>
+      <FolderOpen size={18} />
+      {$t.load}
     </button>
     <button class="util-btn clean" on:click={handleCleanAll} title={$t.clean}>
       <Trash2 size={18} />
@@ -155,6 +192,28 @@
   </div>
 </div>
 
+{#if showLoadModal}
+  <Modal title={$t.savedWorkouts} on:close={() => showLoadModal = false}>
+    <div class="saved-list">
+      {#if $savedWorkoutsStore.length === 0}
+        <p class="empty-msg">{$t.noSavedWorkouts}</p>
+      {:else}
+        {#each $savedWorkoutsStore as workout, i}
+          <div class="saved-item">
+            <button class="load-action" on:click={() => handleLoad(workout)}>
+              <span class="workout-name">{workout.name}</span>
+              <span class="workout-info">{workout.rounds} rounds • {workout.workTime}s/{workout.restTime}s</span>
+            </button>
+            <button class="delete-action" on:click={() => handleDeleteSaved(i)} title={$t.deleteConfirm}>
+              <Trash size={18} />
+            </button>
+          </div>
+        {/each}
+      {/if}
+    </div>
+  </Modal>
+{/if}
+
 <style lang="scss">
   .config-container {
     width: 100%;
@@ -221,12 +280,7 @@
         color: white;
       }
 
-      &.lang:hover {
-        border-color: var(--accent);
-        color: var(--accent);
-      }
-
-      &.share:hover {
+      &.lang:hover, &.share:hover, &.save:hover, &.load:hover {
         border-color: var(--accent);
         color: var(--accent);
       }
@@ -419,6 +473,75 @@
     max-width: 500px;
     margin-left: auto;
     margin-right: auto;
+  }
+
+  /* Saved List Styles */
+  .saved-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    .empty-msg {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 2rem 0;
+    }
+  }
+
+  .saved-item {
+    display: flex;
+    align-items: stretch;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: transform 0.2s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateX(4px);
+    }
+
+    .load-action {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 1rem 1.25rem;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      text-align: left;
+
+      .workout-name {
+        font-weight: 700;
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .workout-info {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+      }
+    }
+
+    .delete-action {
+      padding: 0 1.25rem;
+      background: rgba(239, 68, 68, 0.1);
+      border: none;
+      color: var(--danger);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+
+      &:hover {
+        background: var(--danger);
+        color: white;
+      }
+    }
   }
 
   /* Switch Styles */
