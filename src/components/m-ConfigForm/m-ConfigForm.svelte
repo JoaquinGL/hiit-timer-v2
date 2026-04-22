@@ -76,74 +76,66 @@
     </button>
   </div>
 
-  <div class="main-form-wrapper">
-    <section class="name-section">
-      <div class="name-card">
-        <div class="input-group centered">
-          <label for="workout-name">Nombre del entrenamiento</label>
-          <input 
-            id="workout-name" 
-            type="text" 
-            bind:value={$workoutStore.name} 
-            placeholder="Ej: Quema Grasa" 
-          />
-        </div>
-      </div>
-    </section>
-
-    <div class="form-card">
-      <h3 class="section-title">Ajustes Generales</h3>
-      
-      <div class="grid-inputs">
-        <div class="input-group">
-          <label for="rounds">Rondas</label>
-          <input id="rounds" type="number" bind:value={$workoutStore.rounds} min="1" />
-        </div>
-        <div class="input-group">
-          <label for="work">Training (s)</label>
-          <input id="work" type="number" bind:value={$workoutStore.workTime} min="5" />
-        </div>
-        <div class="input-group">
-          <label for="rest">Descanso (s)</label>
-          <input id="rest" type="number" bind:value={$workoutStore.restTime} min="0" />
-        </div>
-      </div>
-
-      <div class="input-group">
-        <label for="theme">Tema visual (Pexels)</label>
-        <div class="input-with-icon">
-          <ImageIcon size={20} />
-          <input id="theme" type="text" bind:value={$workoutStore.theme} placeholder="Ej: fitness, nature, urban" />
-        </div>
-      </div>
-
-      <div class="toggle-group">
-        <label class="switch">
-          <input type="checkbox" bind:checked={$workoutStore.useRoundNames} />
-          <span class="slider"></span>
-        </label>
-        <span class="toggle-label">Personalizar rondas</span>
-      </div>
-
-      {#if $workoutStore.useRoundNames}
-        <div class="rounds-divider"></div>
-        <h3 class="section-title">Detalle de Rondas</h3>
-        <div class="rounds-list">
-          {#each Array($workoutStore.rounds) as _, i}
-            <div class="round-item">
-              <div class="round-header">
-                <span class="round-number">{i + 1}</span>
-                <span class="round-title">Configuración Ronda</span>
-              </div>
-              <div class="round-inputs">
-                <input type="text" bind:value={roundNamesInputs[i]} on:input={updateRoundData} placeholder="Nombre de la ronda" />
-                <input type="url" bind:value={roundBackgroundsInputs[i]} on:input={updateRoundData} placeholder="URL de imagen de fondo" />
-              </div>
-            </div>
-          {/each}
-        </div>
-      {/if}
+  <div class="main-card">
+    <div class="input-group centered name-input">
+      <label for="workout-name">Nombre del entrenamiento</label>
+      <input 
+        id="workout-name" 
+        type="text" 
+        bind:value={$workoutStore.name} 
+        placeholder="Ej: Quema Grasa" 
+      />
     </div>
+
+    <div class="grid-inputs">
+      <div class="input-group">
+        <label for="rounds">Rondas</label>
+        <input id="rounds" type="number" bind:value={$workoutStore.rounds} min="1" />
+      </div>
+      <div class="input-group">
+        <label for="work">Training (s)</label>
+        <input id="work" type="number" bind:value={$workoutStore.workTime} min="5" />
+      </div>
+      <div class="input-group">
+        <label for="rest">Descanso (s)</label>
+        <input id="rest" type="number" bind:value={$workoutStore.restTime} min="0" />
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label for="theme">Tema visual (Pexels)</label>
+      <div class="input-with-icon">
+        <ImageIcon size={20} />
+        <input id="theme" type="text" bind:value={$workoutStore.theme} placeholder="Ej: fitness, nature, urban" />
+      </div>
+    </div>
+
+    <div class="toggle-group">
+      <label class="switch">
+        <input type="checkbox" bind:checked={$workoutStore.useRoundNames} />
+        <span class="slider"></span>
+      </label>
+      <span class="toggle-label">Personalizar rondas</span>
+    </div>
+
+    {#if $workoutStore.useRoundNames}
+      <div class="rounds-divider"></div>
+      <h3 class="section-title">Detalle de Rondas</h3>
+      <div class="rounds-list">
+        {#each Array($workoutStore.rounds) as _, i}
+          <div class="round-item">
+            <div class="round-header">
+              <span class="round-number">{i + 1}</span>
+              <span class="round-title">Configuración Ronda</span>
+            </div>
+            <div class="round-inputs">
+              <input type="text" bind:value={roundNamesInputs[i]} on:input={updateRoundData} placeholder="Nombre de la ronda" />
+              <input type="url" bind:value={roundBackgroundsInputs[i]} on:input={updateRoundData} placeholder="URL de imagen de fondo" />
+            </div>
+          </div>
+        {/each}
+      </div>
+    {/if}
   </div>
 
   <div class="action-bar">
@@ -157,7 +149,7 @@
 <style lang="scss">
   .config-container {
     width: 100%;
-    max-width: 800px;
+    max-width: 700px;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -233,60 +225,38 @@
     }
   }
 
-  .main-form-wrapper {
+  .main-card {
+    background: var(--bg-card);
+    border-radius: 32px;
+    padding: 2.5rem 2rem;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-    width: 100%;
-  }
-
-  .name-section {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-  }
-
-  .name-card {
-    width: 100%;
-    background: var(--bg-card);
-    border-radius: 24px;
-    padding: 2rem;
+    gap: 2rem;
     border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-    text-align: center;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    width: 100%;
+  }
 
-    .input-group.centered {
-      align-items: center;
+  .name-input {
+    margin-bottom: 0.5rem;
+    
+    input {
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: rgba(0, 0, 0, 0.2) !important;
+      border-color: transparent !important;
+      padding: 1.25rem !important;
       
-      input {
-        text-align: center;
-        font-size: 1.5rem;
-        font-weight: 800;
-        background: rgba(0, 0, 0, 0.2);
-        border-color: transparent;
-        padding: 1.25rem;
-        
-        &:focus {
-          border-color: var(--accent);
-          background: rgba(0, 0, 0, 0.3);
-        }
+      &:focus {
+        border-color: var(--accent) !important;
+        background: rgba(0, 0, 0, 0.3) !important;
       }
     }
   }
 
-  .form-card {
-    background: var(--bg-card);
-    border-radius: 24px;
-    padding: 2rem 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.75rem;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-  }
-
   .section-title {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 800;
     margin: 0;
     color: var(--accent);
@@ -301,17 +271,18 @@
     gap: 0.6rem;
 
     label {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.8px;
+      text-align: center;
     }
 
     input {
       background: rgba(15, 23, 42, 0.6);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 1.1rem;
       color: white;
       font-size: 1rem;
@@ -331,7 +302,7 @@
     grid-template-columns: 1fr;
     gap: 1.25rem;
 
-    @media (min-width: 400px) {
+    @media (min-width: 450px) {
       grid-template-columns: 1fr 1fr 1fr;
       gap: 1rem;
     }
@@ -344,12 +315,12 @@
     
     :global(svg) {
       position: absolute;
-      left: 1rem;
+      left: 1.25rem;
       color: var(--text-muted);
     }
 
     input {
-      padding-left: 3rem;
+      padding-left: 3.5rem;
       width: 100%;
     }
   }
@@ -365,6 +336,7 @@
   .toggle-label {
     font-weight: 600;
     color: var(--text-main);
+    font-size: 0.95rem;
   }
 
   .rounds-divider {
@@ -377,7 +349,7 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    max-height: 500px;
+    max-height: 400px;
     overflow-y: auto;
     padding-right: 0.5rem;
 
@@ -390,8 +362,8 @@
     flex-direction: column;
     gap: 0.75rem;
     background: rgba(0, 0, 0, 0.25);
-    padding: 1rem;
-    border-radius: 16px;
+    padding: 1.25rem;
+    border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.05);
 
     .round-header {
@@ -422,18 +394,18 @@
     .round-inputs {
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.75rem;
 
       input {
-        padding: 0.75rem;
+        padding: 0.85rem;
         font-size: 0.9rem;
-        border-radius: 10px;
+        border-radius: 12px;
       }
     }
   }
 
   .action-bar {
-    margin-top: 2rem;
+    margin-top: 2.5rem;
     padding-bottom: 2rem;
     width: 100%;
     max-width: 500px;
