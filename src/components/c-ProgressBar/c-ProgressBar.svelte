@@ -1,23 +1,26 @@
 <script lang="ts">
   export let progress: number;
+  export let color: string = 'var(--accent)';
 </script>
 
-<div class="progress-bar">
-  <div class="progress" style="width: {progress}%;" />
+<div class="progress-container">
+  <div 
+    class="progress-fill" 
+    style="width: {progress}%; background-color: {color};"
+  ></div>
 </div>
 
 <style>
-  .progress-bar {
+  .progress-container {
     width: 100%;
-    height: 10px;
-    background-color: var(--paper-2);
-    border-radius: 5px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
     overflow: hidden;
   }
 
-  .progress {
+  .progress-fill {
     height: 100%;
-    background-color: var(--accent);
-    transition: width 0.2s ease-in-out;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   }
 </style>

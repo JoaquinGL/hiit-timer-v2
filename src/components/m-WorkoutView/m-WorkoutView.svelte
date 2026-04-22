@@ -3,16 +3,16 @@
   import { sessionStore } from "../../lib/stores/sessionStore";
   import { timerStore, pauseTimer, startTimer, resetTimer } from "../../lib/stores/timerStore";
   import { workoutStore } from "../../lib/stores/workoutStore";
+  import { t } from "../../lib/stores/i18nStore";
   import { getImages } from "../../lib/pexels";
   import ProgressBar from "../c-ProgressBar/c-ProgressBar.svelte";
-  import Button from "../c-Button/c-Button.svelte";
+  import { Pause, Play, RotateCcw, Zap, Coffee } from "lucide-svelte";
 
   let progress = 0;
   let roundLabel = "";
   let images: string[] = [];
   let currentImageIndex = 0;
 
-  // State for cross-fading backgrounds
   let bg1_url = "";
   let bg2_url = "";
   let bg1_opacity = 0;
@@ -23,7 +23,6 @@
 
   const setBackground = (newUrl: string) => {
     if (bg1_url === newUrl || bg2_url === newUrl) return;
-
     if (bg1_opacity > 0) {
       bg2_url = newUrl;
       bg1_opacity = 0;
@@ -45,10 +44,8 @@
 
   const startThemeCarousel = () => {
     if (isThemeCarouselActive || images.length === 0) return;
-    
     isThemeCarouselActive = true;
     setBackground(`url(${images[currentImageIndex]})`);
-
     imageChangeInterval = setInterval(() => {
       currentImageIndex = (currentImageIndex + 1) % images.length;
       setBackground(`url(${images[currentImageIndex]})`);
@@ -59,7 +56,6 @@
     if ($workoutStore.theme && $workoutStore.theme.trim() !== '') {
       images = await getImages($workoutStore.theme, 20);
     }
-    // The reactive logic below will handle the initial state.
   });
 
   onDestroy(() => {
@@ -72,151 +68,210 @@
     return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  // Main reactive block
   $: {
     const workoutConfig = $workoutStore;
     const session = $sessionStore;
-    
-    // --- Progress Bar & Labels ---
     const totalTime = session.currentState === "work" ? workoutConfig.workTime : workoutConfig.restTime;
     progress = totalTime > 0 ? (session.currentTime / totalTime) * 100 : 0;
 
     if (session.currentState === 'work') {
       roundLabel = (workoutConfig.useRoundNames && workoutConfig.roundNames[session.currentRound - 1]) 
         ? workoutConfig.roundNames[session.currentRound - 1] 
-        : `Round ${session.currentRound}`;
-    } else if (session.currentState === 'rest') {
-      const nextRound = session.currentRound;
-      if (nextRound < workoutConfig.rounds) {
-        roundLabel = (workoutConfig.useRoundNames && workoutConfig.roundNames[nextRound]) 
-          ? `Next: ${workoutConfig.roundNames[nextRound]}` 
-          : `Next: Round ${nextRound + 1}`;
-      } else {
-        roundLabel = 'Last Rest';
-      }
-    }
-
-    // --- Background Logic ---
-    if (session.currentState === 'work') {
-      const roundBg = workoutConfig.roundBackgrounds && workoutConfig.roundBackgrounds[session.currentRound - 1];
+        : `${$t.rounds} ${session.currentRound}`;
       
+      const roundBg = workoutConfig.roundBackgrounds && workoutConfig.roundBackgrounds[session.currentRound - 1];
       if (roundBg && roundBg.trim() !== '') {
-        // Specific background for this round
         stopThemeCarousel();
         setBackground(`url(${roundBg})`);
       } else {
-        // No specific background, use theme carousel
         startThemeCarousel();
       }
-    } else if (session.currentState === 'rest') {
-      // For rest, always use the theme carousel
+    } else {
+      const nextRound = session.currentRound;
+      roundLabel = nextRound < workoutConfig.rounds ? $t.prepare : $t.lastRest;
       startThemeCarousel();
     }
   }
-
 </script>
 
-<div class="workout-view">
-  <!-- Background Image Containers -->
+<div class="workout-view" class:is-rest={$sessionStore.currentState === 'rest'}>
   <div class="background" style="background-image: {bg1_url}; opacity: {bg1_opacity};"></div>
   <div class="background" style="background-image: {bg2_url}; opacity: {bg2_opacity};"></div>
+  <div class="overlay"></div>
 
-  <!-- UI Elements -->
-  <div class="progress-bar-container">
-    <ProgressBar {progress} />
+  <div class="top-bar">
+    <ProgressBar {progress} color={$sessionStore.currentState === 'work' ? 'var(--work)' : 'var(--rest)'} />
   </div>
 
-  <div class="top-info">
-    <div class="timer">{formatTime($sessionStore.currentTime)}</div>
-    <div class="round-info">
-      <span class="state-label">{$sessionStore.currentState}</span>
-      <span class="round-label">{roundLabel}</span>
+  <div class="main-content">
+    <div class="status-badge" class:work={$sessionStore.currentState === 'work'}>
+      {#if $sessionStore.currentState === 'work'}
+        <Zap size={16} fill="currentColor" />
+        {$t.trainingBadge}
+      {:else}
+        <Coffee size={16} fill="currentColor" />
+        {$t.restBadge}
+      {/if}
+    </div>
+
+    <div class="timer-display">
+      {formatTime($sessionStore.currentTime)}
+    </div>
+
+    <div class="round-display">
+      {roundLabel}
+      <span class="round-count">{$sessionStore.currentRound} / {$workoutStore.rounds}</span>
     </div>
   </div>
 
-  <div class="controls">
+  <div class="controls-bar">
+    <button class="icon-btn secondary" on:click={resetTimer}>
+      <RotateCcw size={24} />
+    </button>
+    
     {#if $timerStore.state === "running"}
-      <Button on:click={pauseTimer}>Pause</Button>
+      <button class="play-pause-btn" on:click={pauseTimer}>
+        <Pause size={32} fill="currentColor" />
+      </button>
     {:else}
-      <Button on:click={startTimer}>Start</Button>
+      <button class="play-pause-btn" on:click={startTimer}>
+        <Play size={32} fill="currentColor" />
+      </button>
     {/if}
-    <Button on:click={resetTimer}>Reset</Button>
+
+    <div class="spacer"></div>
   </div>
 </div>
 
-<style>
+<style lang="scss">
   .workout-view {
     position: relative;
     width: 100%;
     height: 100%;
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: #000;
+    color: white;
   }
 
   .background {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     background-size: cover;
     background-position: center;
-    transition: opacity 1s ease-in-out;
-    z-index: 0; /* Background layer */
+    transition: opacity 1.5s ease-in-out;
+    z-index: 0;
   }
-  
-  /* Make sure all UI elements are on top of the background */
-  .progress-bar-container,
-  .top-info,
-  .controls {
-    position: relative;
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.8) 100%);
     z-index: 1;
   }
-  
-  .progress-bar-container {
-    position: absolute;
-    top: 0;
-    left: 0;
+
+  .top-bar {
+    position: relative;
+    z-index: 10;
     width: 100%;
   }
 
-  .top-info {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    right: 20px;
+  .main-content {
+    position: relative;
+    z-index: 10;
+    flex: 1;
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    color: white;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem 1.5rem;
   }
 
-  .timer {
-    font-size: 4rem;
-    font-weight: bold;
+  .status-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    background: var(--rest);
+    border-radius: 100px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+
+    &.work {
+      background: var(--work);
+    }
   }
 
-  .round-info {
-    text-align: right;
+  .timer-display {
+    font-size: clamp(4.5rem, 22vw, 8.5rem);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    width: 100%;
+    padding: 0 1rem;
   }
 
-  .state-label {
-    display: block;
-    font-size: 2rem;
-    text-transform: capitalize;
-    font-weight: bold;
-  }
-
-  .round-label {
+  .round-display {
     font-size: 1.5rem;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 90%;
+
+    .round-count {
+      font-size: 1rem;
+      opacity: 0.7;
+      font-weight: 400;
+    }
   }
 
-  .controls {
-    position: absolute;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
+  .controls-bar {
+    position: relative;
+    z-index: 10;
+    padding: 2.5rem 2rem;
     display: flex;
-    gap: 20px;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
   }
+
+  .play-pause-btn {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    background: white;
+    color: black;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    transition: transform 0.2s;
+
+    &:active { transform: scale(0.9); }
+  }
+
+  .icon-btn {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+  }
+
+  .spacer { width: 54px; }
 </style>
