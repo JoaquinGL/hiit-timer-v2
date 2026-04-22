@@ -76,13 +76,24 @@
     </button>
   </div>
 
+  <section class="name-section">
+    <div class="name-card">
+      <div class="input-group centered">
+        <label for="workout-name">Nombre del entrenamiento</label>
+        <input 
+          id="workout-name" 
+          type="text" 
+          bind:value={$workoutStore.name} 
+          placeholder="Ej: Quema Grasa" 
+        />
+      </div>
+    </div>
+  </section>
+
   <div class="form-layout">
     <div class="form-card main-settings">
-      <div class="input-group">
-        <label for="workout-name">Nombre del entrenamiento</label>
-        <input id="workout-name" type="text" bind:value={$workoutStore.name} placeholder="Ej: Quema Grasa" />
-      </div>
-
+      <h3 class="section-title">Ajustes Generales</h3>
+      
       <div class="grid-inputs">
         <div class="input-group">
           <label for="rounds">Rondas</label>
@@ -190,7 +201,7 @@
     display: flex;
     justify-content: center;
     gap: 1rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
 
     .util-btn {
       display: flex;
@@ -223,6 +234,42 @@
     }
   }
 
+  .name-section {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+
+  .name-card {
+    width: 100%;
+    max-width: 600px;
+    background: var(--bg-card);
+    border-radius: 24px;
+    padding: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    text-align: center;
+
+    .input-group.centered {
+      align-items: center;
+      
+      input {
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 800;
+        background: rgba(0, 0, 0, 0.2);
+        border-color: transparent;
+        padding: 1.25rem;
+        
+        &:focus {
+          border-color: var(--accent);
+          background: rgba(0, 0, 0, 0.3);
+        }
+      }
+    }
+  }
+
   .form-layout {
     display: grid;
     grid-template-columns: 1fr;
@@ -249,7 +296,7 @@
     &.main-settings {
       @media (min-width: 800px) {
         position: sticky;
-        top: 0;
+        top: 1rem;
       }
     }
   }
