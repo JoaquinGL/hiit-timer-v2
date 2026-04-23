@@ -8,20 +8,20 @@
   let isVisible = true;
   let isRevealing = false;
 
-  // Configuración de la animación (puedes cambiar el path por tu JSON de Lottie)
   onMount(() => {
     const anim = lottie.loadAnimation({
       container: container,
       renderer: 'svg',
       loop: true,
       autoplay: true,
-      path: 'https://assets9.lottiefiles.com/packages/lf20_m6cuL6.json' // Placeholder
+      path: '/splash-animation.json'
     });
 
-    // Simulamos una duración inicial, luego tú me dirás cuánto quieres que dure
+    // La animación dura unos 3.6 segundos (220 frames a 60fps)
+    // Iniciamos el revelado un poco antes de que termine el primer ciclo
     setTimeout(() => {
       startReveal();
-    }, 2500);
+    }, 3500);
 
     return () => anim.destroy();
   });
@@ -31,7 +31,7 @@
     setTimeout(() => {
       isVisible = false;
       dispatch('complete');
-    }, 800); // Duración de la transición líquida
+    }, 800);
   };
 </script>
 
@@ -42,8 +42,6 @@
     out:fade={{ duration: 300 }}
   >
     <div class="lottie-container" bind:this={container}></div>
-    
-    <!-- Capa de transición líquida -->
     <div class="liquid-layer"></div>
   </div>
 {/if}
@@ -61,9 +59,10 @@
   }
 
   .lottie-container {
-    width: 200px;
-    height: 200px;
+    width: 300px;
+    height: 300px;
     z-index: 2;
+    filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.2));
   }
 
   .liquid-layer {
@@ -79,13 +78,11 @@
     clip-path: circle(0% at 50% 50%);
   }
 
-  /* Efecto de distorsión suave para simular líquido */
   .splash-screen.reveal {
     filter: url(#liquid-filter);
   }
 </style>
 
-<!-- Filtro SVG para el efecto líquido (opcional, añade realismo) -->
 <svg style="position: absolute; width: 0; height: 0;">
   <filter id="liquid-filter">
     <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
