@@ -20,6 +20,26 @@
 
   let imageChangeInterval: any;
   let isThemeCarouselActive = false;
+  let wakeLock: any = null;
+
+  // Función para solicitar que la pantalla no se apague
+  const requestWakeLock = async () => {
+    if ('wakeLock' in navigator) {
+      try {
+        wakeLock = await (navigator as any).wakeLock.request('screen');
+        console.log('Wake Lock activo: la pantalla no se apagará');
+      } catch (err) {
+        console.error(`${err.name}, ${err.message}`);
+      }
+    }
+  };
+
+  const releaseWakeLock = async () => {
+    if (wakeLock !== null) {
+      await wakeLock.release();
+      wakeLock = null;
+    }
+  };
 
   const setBackground = (newUrl: string) => {
     if (bg1_url === newUrl || bg2_url === newUrl) return;
@@ -52,7 +72,17 @@
     }, 10000);
   };
 
+  // Re-activar wake lock si el usuario vuelve a la pestaña
+  const handleVisibilityChange = async () => {
+    if (wakeLock !== null && document.visibilityState === 'visible') {
+      await requestWakeLock();
+    }
+  };
+
   onMount(async () => {
+    requestWakeLock();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     if ($workoutStore.theme && $workoutStore.theme.trim() !== '') {
       images = await getImages($workoutStore.theme, 20);
     }
@@ -60,6 +90,8 @@
 
   onDestroy(() => {
     stopThemeCarousel();
+    releaseWakeLock();
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
   });
 
   const formatTime = (time: number) => {
