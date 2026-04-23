@@ -2,6 +2,7 @@
   import { onMount, createEventDispatcher } from 'svelte';
   import lottie from 'lottie-web';
   import { fade } from 'svelte/transition';
+  import animationData from '../../lib/assets/splash-animation.json';
 
   const dispatch = createEventDispatcher();
   let container: HTMLElement;
@@ -14,11 +15,10 @@
       renderer: 'svg',
       loop: true,
       autoplay: true,
-      path: '/splash-animation.json'
+      animationData: animationData
     });
 
-    // La animación dura unos 3.6 segundos (220 frames a 60fps)
-    // Iniciamos el revelado un poco antes de que termine el primer ciclo
+    // Iniciamos el efecto de revelado líquido después de 3.5 segundos
     setTimeout(() => {
       startReveal();
     }, 3500);
