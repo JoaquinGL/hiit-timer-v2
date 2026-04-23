@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      lottie-web:
+        specifier: ^5.13.0
+        version: 5.13.0
       lucide-svelte:
         specifier: ^1.0.1
         version: 1.0.1(svelte@5.55.4)
@@ -529,6 +532,9 @@ packages:
   locate-character@3.0.0:
     resolution: {integrity: sha512-SW13ws7BjaeJ6p7Q6CO2nchbYEc3X3J6WrmTTDto7yMPqVSZTUyY5Tjbid+Ab8gLnATtygYtiDIJGQRRn2ZOiA==}
 
+  lottie-web@5.13.0:
+    resolution: {integrity: sha512-+gfBXl6sxXMPe8tKQm7qzLnUy5DUPJPKIyRHwtpCpyUEYjHYRJC/5gjUvdkuO2c3JllrPtHXH5UJJK8LRYl5yQ==}
+
   lucide-svelte@1.0.1:
     resolution: {integrity: sha512-WvzZgk0pqzgda+AErLvgWxHkfg/+GgUwqKMRHvzt0IqyMdmyEDzDCk3Z+Wo/3y753oIgx8u9Q4eUbWkghFa8Jg==}
     peerDependencies:
@@ -1026,6 +1032,8 @@ snapshots:
       - encoding
 
   locate-character@3.0.0: {}
+
+  lottie-web@5.13.0: {}
 
   lucide-svelte@1.0.1(svelte@5.55.4):
     dependencies:
