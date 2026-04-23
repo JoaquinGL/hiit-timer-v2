@@ -38,7 +38,11 @@ const translations = {
     maxReached: "Límite de 5 entrenamientos alcanzado",
     deleteConfirm: "¿Eliminar este entrenamiento?",
     workoutSaved: "¡Entrenamiento guardado!",
-    unnamedWorkout: "Entrenamiento sin nombre"
+    unnamedWorkout: "Entrenamiento sin nombre",
+    importTitle: "Importar Código",
+    importPlaceholder: "Pega aquí la URL o el código...",
+    importButton: "Cargar Código",
+    importError: "Código no válido"
   },
   en: {
     subtitle: "Configure your workout session",
@@ -73,7 +77,11 @@ const translations = {
     maxReached: "Limit of 5 workouts reached",
     deleteConfirm: "Delete this workout?",
     workoutSaved: "Workout saved!",
-    unnamedWorkout: "Unnamed Workout"
+    unnamedWorkout: "Unnamed Workout",
+    importTitle: "Import Code",
+    importPlaceholder: "Paste URL or code here...",
+    importButton: "Load Code",
+    importError: "Invalid code"
   }
 };
 

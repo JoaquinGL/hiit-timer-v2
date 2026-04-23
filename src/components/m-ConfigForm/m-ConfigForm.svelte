@@ -4,14 +4,16 @@
   import { languageStore, t } from "../../lib/stores/i18nStore";
   import { savedWorkoutsStore, saveWorkout, deleteWorkout } from "../../lib/stores/savedWorkoutsStore";
   import { resetTimer, startTimer } from "../../lib/stores/timerStore";
-  import { encodeWorkout, copyToClipboard } from "../../lib/utils";
+  import { encodeWorkout, decodeWorkout, copyToClipboard } from "../../lib/utils";
   import Button from "../c-Button/c-Button.svelte";
   import Modal from "../c-Modal/c-Modal.svelte";
-  import { Play, Settings2, Image as ImageIcon, Share2, Trash2, Languages, Save, FolderOpen, Trash, Check } from "lucide-svelte";
+  import { Play, Settings2, Image as ImageIcon, Share2, Trash2, Languages, Save, FolderOpen, Trash, Check, Download } from "lucide-svelte";
   import { fade } from "svelte/transition";
 
   let showLoadModal = false;
   let showCopyFeedback = false;
+  let showSaveFeedback = false;
+  let importCode = "";
 
   const handleStart = () => {
     resetTimer();
@@ -37,25 +39,10 @@
     
     const success = saveWorkout(config);
     if (success) {
-      triggerFeedback();
+      showSaveFeedback = true;
+      setTimeout(() => showSaveFeedback = false, 2000);
     } else {
       alert($t.maxReached);
-    }
-  };
-
-  const triggerFeedback = () => {
-    showCopyFeedback = true;
-    setTimeout(() => showCopyFeedback = false, 2000);
-  };
-
-  const handleLoad = (workout: WorkoutConfig) => {
-    workoutStore.set(JSON.parse(JSON.stringify(workout)));
-    showLoadModal = false;
-  };
-
-  const handleDeleteSaved = (index: number) => {
-    if (confirm($t.deleteConfirm)) {
-      deleteWorkout(index);
     }
   };
 
@@ -76,8 +63,40 @@
     } else {
       const success = await copyToClipboard(shareUrl);
       if (success) {
-        triggerFeedback();
+        showCopyFeedback = true;
+        setTimeout(() => showCopyFeedback = false, 2000);
       }
+    }
+  };
+
+  const handleImport = () => {
+    if (!importCode.trim()) return;
+    
+    let code = importCode;
+    // Si es una URL, extraemos el parámetro 'w'
+    if (code.includes('?w=')) {
+      const url = new URL(code);
+      code = url.searchParams.get('w') || "";
+    }
+
+    const decoded = decodeWorkout(code);
+    if (decoded) {
+      workoutStore.set(decoded);
+      importCode = "";
+      showLoadModal = false;
+    } else {
+      alert($t.importError);
+    }
+  };
+
+  const handleLoad = (workout: WorkoutConfig) => {
+    workoutStore.set(JSON.parse(JSON.stringify(workout)));
+    showLoadModal = false;
+  };
+
+  const handleDeleteSaved = (index: number) => {
+    if (confirm($t.deleteConfirm)) {
+      deleteWorkout(index);
     }
   };
 
@@ -102,6 +121,13 @@
     <div class="toast-feedback" transition:fade>
       <Check size={18} />
       <span>{$t.copied}</span>
+    </div>
+  {/if}
+
+  {#if showSaveFeedback}
+    <div class="toast-feedback save" transition:fade>
+      <Save size={18} />
+      <span>{$t.workoutSaved}</span>
     </div>
   {/if}
 
@@ -207,23 +233,41 @@
 </div>
 
 {#if showLoadModal}
-  <Modal title={$t.savedWorkouts} on:close={() => showLoadModal = false}>
-    <div class="saved-list">
-      {#if $savedWorkoutsStore.length === 0}
-        <p class="empty-msg">{$t.noSavedWorkouts}</p>
-      {:else}
-        {#each $savedWorkoutsStore as workout, i}
-          <div class="saved-item">
-            <button class="load-action" on:click={() => handleLoad(workout)}>
-              <span class="workout-name">{workout.name}</span>
-              <span class="workout-info">{workout.rounds} rounds • {workout.workTime}s/{workout.restTime}s</span>
-            </button>
-            <button class="delete-action" on:click={() => handleDeleteSaved(i)} title={$t.deleteConfirm}>
-              <Trash size={18} />
-            </button>
-          </div>
-        {/each}
-      {/if}
+  <Modal title={$t.load} on:close={() => showLoadModal = false}>
+    <div class="load-modal-content">
+      <div class="import-section">
+        <h4>{$t.importTitle}</h4>
+        <div class="import-input-group">
+          <input 
+            type="text" 
+            bind:value={importCode} 
+            placeholder={$t.importPlaceholder} 
+          />
+          <button class="import-btn" on:click={handleImport}>
+            <Download size={18} />
+          </button>
+        </div>
+      </div>
+
+      <div class="divider"><span>{$t.savedWorkouts}</span></div>
+
+      <div class="saved-list">
+        {#if $savedWorkoutsStore.length === 0}
+          <p class="empty-msg">{$t.noSavedWorkouts}</p>
+        {:else}
+          {#each $savedWorkoutsStore as workout, i}
+            <div class="saved-item">
+              <button class="load-action" on:click={() => handleLoad(workout)}>
+                <span class="workout-name">{workout.name}</span>
+                <span class="workout-info">{workout.rounds} rounds • {workout.workTime}s/{workout.restTime}s</span>
+              </button>
+              <button class="delete-action" on:click={() => handleDeleteSaved(i)} title={$t.deleteConfirm}>
+                <Trash size={18} />
+              </button>
+            </div>
+          {/each}
+        {/if}
+      </div>
     </div>
   </Modal>
 {/if}
@@ -254,6 +298,11 @@
     font-weight: 700;
     box-shadow: 0 10px 25px rgba(34, 197, 94, 0.4);
     z-index: 2000;
+
+    &.save {
+      background: var(--accent);
+      box-shadow: 0 10px 25px rgba(56, 189, 248, 0.4);
+    }
   }
 
   .header {
@@ -507,7 +556,64 @@
     margin-right: auto;
   }
 
-  /* Saved List Styles */
+  /* Load Modal Styles */
+  .load-modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .import-section {
+    h4 {
+      margin: 0 0 0.75rem;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+    }
+
+    .import-input-group {
+      display: flex;
+      gap: 0.5rem;
+
+      input {
+        flex: 1;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        color: white;
+        font-size: 0.9rem;
+        &:focus { outline: none; border-color: var(--accent); }
+      }
+
+      .import-btn {
+        background: var(--accent);
+        border: none;
+        color: white;
+        width: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: transform 0.2s;
+        &:active { transform: scale(0.9); }
+      }
+    }
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    &::before, &::after { content: ''; flex: 1; height: 1px; background: rgba(255, 255, 255, 0.1); }
+  }
+
   .saved-list {
     display: flex;
     flex-direction: column;
@@ -516,7 +622,8 @@
     .empty-msg {
       text-align: center;
       color: var(--text-muted);
-      padding: 2rem 0;
+      padding: 1rem 0;
+      font-size: 0.9rem;
     }
   }
 
