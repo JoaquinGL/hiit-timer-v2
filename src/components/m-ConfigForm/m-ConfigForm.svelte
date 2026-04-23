@@ -7,13 +7,17 @@
   import { encodeWorkout, decodeWorkout, copyToClipboard } from "../../lib/utils";
   import Button from "../c-Button/c-Button.svelte";
   import Modal from "../c-Modal/c-Modal.svelte";
-  import { Play, Settings2, Image as ImageIcon, Share2, Trash2, Languages, Save, FolderOpen, Trash, Check, Download } from "lucide-svelte";
+  import { Play, Settings2, Image as ImageIcon, Share2, Trash2, Languages, Save, FolderOpen, Trash, Check, Download, Copy, Link } from "lucide-svelte";
   import { fade } from "svelte/transition";
 
   let showLoadModal = false;
+  let showShareModal = false;
   let showCopyFeedback = false;
   let showSaveFeedback = false;
   let importCode = "";
+  
+  let currentWorkoutCode = "";
+  let currentWorkoutUrl = "";
 
   const handleStart = () => {
     resetTimer();
@@ -46,26 +50,17 @@
     }
   };
 
-  const handleShare = async () => {
-    const encoded = encodeWorkout($workoutStore);
-    const shareUrl = `${window.location.origin}${window.location.pathname}?w=${encoded}`;
-    
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `HIIT Timer: ${$workoutStore.name}`,
-          text: $t.subtitle,
-          url: shareUrl,
-        });
-      } catch (err) {
-        console.log('Error sharing', err);
-      }
-    } else {
-      const success = await copyToClipboard(shareUrl);
-      if (success) {
-        showCopyFeedback = true;
-        setTimeout(() => showCopyFeedback = false, 2000);
-      }
+  const handleOpenShare = () => {
+    currentWorkoutCode = encodeWorkout($workoutStore);
+    currentWorkoutUrl = `${window.location.origin}${window.location.pathname}?w=${currentWorkoutCode}`;
+    showShareModal = true;
+  };
+
+  const handleCopy = async (text: string) => {
+    const success = await copyToClipboard(text);
+    if (success) {
+      showCopyFeedback = true;
+      setTimeout(() => showCopyFeedback = false, 2000);
     }
   };
 
@@ -73,7 +68,6 @@
     if (!importCode.trim()) return;
     
     let code = importCode;
-    // Si es una URL, extraemos el parámetro 'w'
     if (code.includes('?w=')) {
       const url = new URL(code);
       code = url.searchParams.get('w') || "";
@@ -144,7 +138,7 @@
       <Languages size={18} />
       {$languageStore === 'es' ? 'English' : 'Español'}
     </button>
-    <button class="util-btn share" on:click={handleShare} title={$t.share}>
+    <button class="util-btn share" on:click={handleOpenShare} title={$t.share}>
       <Share2 size={18} />
       {$t.share}
     </button>
@@ -267,6 +261,32 @@
             </div>
           {/each}
         {/if}
+      </div>
+    </div>
+  </Modal>
+{/if}
+
+{#if showShareModal}
+  <Modal title={$t.shareTitle} on:close={() => showShareModal = false}>
+    <div class="share-modal-content">
+      <div class="share-section">
+        <label>{$t.shareCode}</label>
+        <div class="share-box">
+          <code class="code-text">{currentWorkoutCode}</code>
+          <button class="copy-btn" on:click={() => handleCopy(currentWorkoutCode)}>
+            <Copy size={18} />
+          </button>
+        </div>
+      </div>
+
+      <div class="share-section">
+        <label>{$t.shareLink}</label>
+        <div class="share-box">
+          <span class="url-text">{currentWorkoutUrl}</span>
+          <button class="copy-btn" on:click={() => handleCopy(currentWorkoutUrl)}>
+            <Link size={18} />
+          </button>
+        </div>
       </div>
     </div>
   </Modal>
@@ -679,6 +699,67 @@
       &:hover {
         background: var(--danger);
         color: white;
+      }
+    }
+  }
+
+  /* Share Modal Styles */
+  .share-modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .share-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .share-box {
+      display: flex;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 0.5rem;
+      gap: 0.5rem;
+
+      .code-text, .url-text {
+        flex: 1;
+        font-size: 0.85rem;
+        padding: 0.5rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: var(--text-main);
+      }
+
+      .code-text {
+        font-family: monospace;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 6px;
+      }
+
+      .copy-btn {
+        background: var(--accent);
+        border: none;
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: transform 0.2s;
+        &:active { transform: scale(0.9); }
       }
     }
   }

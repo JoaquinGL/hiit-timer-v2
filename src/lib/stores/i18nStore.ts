@@ -32,7 +32,7 @@ const translations = {
     statsTotalTime: "Tiempo Total",
     backHome: "Volver al Inicio",
     confirmClean: "¿Estás seguro de que quieres limpiar toda la configuración?",
-    copied: "¡Enlace copiado al portapapeles!",
+    copied: "¡Copiado al portapapeles!",
     savedWorkouts: "Entrenamientos Guardados",
     noSavedWorkouts: "No tienes entrenamientos guardados",
     maxReached: "Límite de 5 entrenamientos alcanzado",
@@ -42,7 +42,12 @@ const translations = {
     importTitle: "Importar Código",
     importPlaceholder: "Pega aquí la URL o el código...",
     importButton: "Cargar Código",
-    importError: "Código no válido"
+    importError: "Código no válido",
+    shareTitle: "Compartir Entrenamiento",
+    shareCode: "Código de Entrenamiento",
+    shareLink: "Enlace Directo",
+    copyCode: "Copiar Código",
+    copyLink: "Copiar Enlace"
   },
   en: {
     subtitle: "Configure your workout session",
@@ -71,7 +76,7 @@ const translations = {
     statsTotalTime: "Total Time",
     backHome: "Back to Home",
     confirmClean: "Are you sure you want to clear all settings?",
-    copied: "Link copied to clipboard!",
+    copied: "Copied to clipboard!",
     savedWorkouts: "Saved Workouts",
     noSavedWorkouts: "No saved workouts",
     maxReached: "Limit of 5 workouts reached",
@@ -81,7 +86,12 @@ const translations = {
     importTitle: "Import Code",
     importPlaceholder: "Paste URL or code here...",
     importButton: "Load Code",
-    importError: "Invalid code"
+    importError: "Invalid code",
+    shareTitle: "Share Workout",
+    shareCode: "Workout Code",
+    shareLink: "Direct Link",
+    copyCode: "Copy Code",
+    copyLink: "Copy Link"
   }
 };
 
