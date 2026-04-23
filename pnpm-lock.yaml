@@ -14,6 +14,9 @@ importers:
       lucide-svelte:
         specifier: ^1.0.1
         version: 1.0.1(svelte@5.55.4)
+      lz-string:
+        specifier: ^1.5.0
+        version: 1.5.0
       pexels:
         specifier: ^1.4.0
         version: 1.4.0
@@ -540,6 +543,10 @@ packages:
     peerDependencies:
       svelte: ^3 || ^4 || ^5.0.0-next.42
 
+  lz-string@1.5.0:
+    resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
+    hasBin: true
+
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
 
@@ -1038,6 +1045,8 @@ snapshots:
   lucide-svelte@1.0.1(svelte@5.55.4):
     dependencies:
       svelte: 5.55.4
+
+  lz-string@1.5.0: {}
 
   magic-string@0.30.21:
     dependencies:

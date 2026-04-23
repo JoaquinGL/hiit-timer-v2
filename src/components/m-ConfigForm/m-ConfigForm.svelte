@@ -7,9 +7,11 @@
   import { encodeWorkout, copyToClipboard } from "../../lib/utils";
   import Button from "../c-Button/c-Button.svelte";
   import Modal from "../c-Modal/c-Modal.svelte";
-  import { Play, Settings2, Image as ImageIcon, Share2, Trash2, Languages, Save, FolderOpen, Trash } from "lucide-svelte";
+  import { Play, Settings2, Image as ImageIcon, Share2, Trash2, Languages, Save, FolderOpen, Trash, Check } from "lucide-svelte";
+  import { fade } from "svelte/transition";
 
   let showLoadModal = false;
+  let showCopyFeedback = false;
 
   const handleStart = () => {
     resetTimer();
@@ -35,10 +37,15 @@
     
     const success = saveWorkout(config);
     if (success) {
-      alert($t.workoutSaved);
+      triggerFeedback();
     } else {
       alert($t.maxReached);
     }
+  };
+
+  const triggerFeedback = () => {
+    showCopyFeedback = true;
+    setTimeout(() => showCopyFeedback = false, 2000);
   };
 
   const handleLoad = (workout: WorkoutConfig) => {
@@ -69,7 +76,7 @@
     } else {
       const success = await copyToClipboard(shareUrl);
       if (success) {
-        alert($t.copied);
+        triggerFeedback();
       }
     }
   };
@@ -91,6 +98,13 @@
 </script>
 
 <div class="config-container">
+  {#if showCopyFeedback}
+    <div class="toast-feedback" transition:fade>
+      <Check size={18} />
+      <span>{$t.copied}</span>
+    </div>
+  {/if}
+
   <header class="header">
     <div class="icon-badge">
       <Settings2 size={32} />
@@ -222,6 +236,24 @@
     flex-direction: column;
     padding: 2rem 1.25rem;
     margin: 0 auto;
+    position: relative;
+  }
+
+  .toast-feedback {
+    position: fixed;
+    top: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--work);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 700;
+    box-shadow: 0 10px 25px rgba(34, 197, 94, 0.4);
+    z-index: 2000;
   }
 
   .header {
