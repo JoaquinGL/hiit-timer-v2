@@ -53,7 +53,8 @@
     align-items: flex-start;
     width: 100%;
     min-height: 100vh;
-    transition: opacity 0.5s ease;
+    /* Transición más rápida y con curva de performance */
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   main.hidden {
