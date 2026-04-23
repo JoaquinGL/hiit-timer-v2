@@ -13,21 +13,22 @@
     const anim = lottie.loadAnimation({
       container: container,
       renderer: 'svg',
-      loop: true,
+      loop: false, // Solo una vez para que sea más rápido
       autoplay: true,
       animationData: animationData
     });
 
-    // Iniciamos el efecto de revelado líquido después de 3.5 segundos
-    setTimeout(() => {
+    // Escuchamos exactamente cuando termina la animación
+    anim.addEventListener('complete', () => {
       startReveal();
-    }, 3500);
+    });
 
     return () => anim.destroy();
   });
 
   const startReveal = () => {
     isRevealing = true;
+    // El CSS transition dura 0.8s, esperamos a que termine para desmontar
     setTimeout(() => {
       isVisible = false;
       dispatch('complete');
