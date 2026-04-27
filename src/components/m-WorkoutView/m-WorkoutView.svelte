@@ -123,10 +123,15 @@
     return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  // Lógica de avisos en los últimos 3 segundos
+  // Lógica de avisos sonoros: Solo en fase 'work'
   $: {
     const session = $sessionStore;
-    if (session.currentTime <= 3 && session.currentTime > 0 && $timerStore.state === 'running') {
+    if (
+      session.currentState === 'work' && 
+      session.currentTime <= 3 && 
+      session.currentTime > 0 && 
+      $timerStore.state === 'running'
+    ) {
       playBeep();
     }
   }
@@ -179,7 +184,7 @@
 
     <div 
       class="timer-display" 
-      class:is-low-time={$sessionStore.currentTime <= 3 && $sessionStore.currentTime > 0}
+      class:is-low-time={$sessionStore.currentState === 'work' && $sessionStore.currentTime <= 3 && $sessionStore.currentTime > 0}
     >
       {formatTime($sessionStore.currentTime)}
     </div>
