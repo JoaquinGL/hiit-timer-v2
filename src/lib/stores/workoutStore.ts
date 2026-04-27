@@ -9,6 +9,7 @@ export interface WorkoutConfig {
   roundNames: string[];
   roundBackgrounds: string[];
   theme: string;
+  soundEnabled: boolean;
 }
 
 export const defaultWorkout: WorkoutConfig = {
@@ -20,6 +21,7 @@ export const defaultWorkout: WorkoutConfig = {
   roundNames: [],
   roundBackgrounds: [],
   theme: '',
+  soundEnabled: false,
 };
 
 export const workoutStore = writable<WorkoutConfig>({ ...defaultWorkout, name: 'My HIIT Workout' });

@@ -47,7 +47,8 @@ const translations = {
     shareCode: "Código de Entrenamiento",
     shareLink: "Enlace Directo",
     copyCode: "Copiar Código",
-    copyLink: "Copiar Enlace"
+    copyLink: "Copiar Enlace",
+    soundLabel: "Avisos sonoros"
   },
   en: {
     subtitle: "Configure your workout session",
@@ -91,7 +92,8 @@ const translations = {
     shareCode: "Workout Code",
     shareLink: "Direct Link",
     copyCode: "Copy Code",
-    copyLink: "Copy Link"
+    copyLink: "Copy Link",
+    soundLabel: "Sound alerts"
   }
 };
 

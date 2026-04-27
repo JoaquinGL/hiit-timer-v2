@@ -7,7 +7,7 @@
   import { encodeWorkout, decodeWorkout, copyToClipboard } from "../../lib/utils";
   import Button from "../c-Button/c-Button.svelte";
   import Modal from "../c-Modal/c-Modal.svelte";
-  import { Play, Settings2, Image as ImageIcon, Share2, Trash2, Languages, Save, FolderOpen, Trash, Check, Download, Copy, Link } from "lucide-svelte";
+  import { Play, Settings2, Image as ImageIcon, Share2, Trash2, Languages, Save, FolderOpen, Trash, Check, Download, Copy, Link, Volume2, VolumeX } from "lucide-svelte";
   import { fade } from "svelte/transition";
 
   let showLoadModal = false;
@@ -190,12 +190,29 @@
       </div>
     </div>
 
-    <div class="toggle-group">
-      <label class="switch">
-        <input type="checkbox" bind:checked={$workoutStore.useRoundNames} />
-        <span class="slider"></span>
-      </label>
-      <span class="toggle-label">{$t.customizeRounds}</span>
+    <div class="toggles-row">
+      <div class="toggle-group">
+        <label class="switch">
+          <input type="checkbox" bind:checked={$workoutStore.soundEnabled} />
+          <span class="slider"></span>
+        </label>
+        <span class="toggle-label">
+          {#if $workoutStore.soundEnabled}
+            <Volume2 size={16} />
+          {:else}
+            <VolumeX size={16} />
+          {/if}
+          {$t.soundLabel}
+        </span>
+      </div>
+
+      <div class="toggle-group">
+        <label class="switch">
+          <input type="checkbox" bind:checked={$workoutStore.useRoundNames} />
+          <span class="slider"></span>
+        </label>
+        <span class="toggle-label">{$t.customizeRounds}</span>
+      </div>
     </div>
 
     {#if $workoutStore.useRoundNames}
@@ -493,18 +510,32 @@
     }
   }
 
+  .toggles-row {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 0.5rem 0;
+
+    @media (min-width: 450px) {
+      flex-direction: row;
+      justify-content: space-around;
+    }
+  }
+
   .toggle-group {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 1rem;
-    padding: 0.5rem 0;
   }
 
   .toggle-label {
     font-weight: 600;
     color: var(--text-main);
     font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    :global(svg) { color: var(--accent); }
   }
 
   .rounds-divider {

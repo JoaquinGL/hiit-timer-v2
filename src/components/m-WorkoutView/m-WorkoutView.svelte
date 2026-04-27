@@ -21,13 +21,36 @@
   let imageChangeInterval: any;
   let isThemeCarouselActive = false;
   let wakeLock: any = null;
+  
+  // Audio Context para generar pitidos sin archivos externos
+  let audioCtx: AudioContext | null = null;
 
-  // Función para solicitar que la pantalla no se apague
+  const playBeep = () => {
+    if (!$workoutStore.soundEnabled) return;
+    
+    if (!audioCtx) audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // La 440Hz
+    
+    gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.01);
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.2);
+
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + 0.2);
+  };
+
   const requestWakeLock = async () => {
     if ('wakeLock' in navigator) {
       try {
         wakeLock = await (navigator as any).wakeLock.request('screen');
-        console.log('Wake Lock activo: la pantalla no se apagará');
       } catch (err) {
         console.error(`${err.name}, ${err.message}`);
       }
@@ -72,7 +95,6 @@
     }, 10000);
   };
 
-  // Re-activar wake lock si el usuario vuelve a la pestaña
   const handleVisibilityChange = async () => {
     if (wakeLock !== null && document.visibilityState === 'visible') {
       await requestWakeLock();
@@ -92,6 +114,7 @@
     stopThemeCarousel();
     releaseWakeLock();
     document.removeEventListener('visibilitychange', handleVisibilityChange);
+    if (audioCtx) audioCtx.close();
   });
 
   const formatTime = (time: number) => {
@@ -99,6 +122,14 @@
     const seconds = time % 60;
     return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   };
+
+  // Lógica de avisos en los últimos 3 segundos
+  $: {
+    const session = $sessionStore;
+    if (session.currentTime <= 3 && session.currentTime > 0 && $timerStore.state === 'running') {
+      playBeep();
+    }
+  }
 
   $: {
     const workoutConfig = $workoutStore;
@@ -146,7 +177,10 @@
       {/if}
     </div>
 
-    <div class="timer-display">
+    <div 
+      class="timer-display" 
+      class:is-low-time={$sessionStore.currentTime <= 3 && $sessionStore.currentTime > 0}
+    >
       {formatTime($sessionStore.currentTime)}
     </div>
 
@@ -247,6 +281,18 @@
     text-shadow: 0 10px 30px rgba(0,0,0,0.6);
     width: 100%;
     padding: 0 1rem;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    &.is-low-time {
+      color: var(--danger);
+      animation: pulse-timer 1s infinite;
+    }
+  }
+
+  @keyframes pulse-timer {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); text-shadow: 0 0 30px rgba(239, 68, 68, 0.6); }
+    100% { transform: scale(1); }
   }
 
   .round-display {
