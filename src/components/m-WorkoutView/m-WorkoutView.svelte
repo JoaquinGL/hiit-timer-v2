@@ -1,12 +1,12 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import { sessionStore } from "../../lib/stores/sessionStore";
-  import { timerStore, pauseTimer, startTimer, resetTimer } from "../../lib/stores/timerStore";
+  import { timerStore, pauseTimer, startTimer, resetTimer, nextRound, prevRound } from "../../lib/stores/timerStore";
   import { workoutStore } from "../../lib/stores/workoutStore";
   import { t } from "../../lib/stores/i18nStore";
   import { getImages } from "../../lib/pexels";
   import ProgressBar from "../c-ProgressBar/c-ProgressBar.svelte";
-  import { Pause, Play, RotateCcw, Zap, Coffee } from "lucide-svelte";
+  import { Pause, Play, ArrowLeft, Zap, Coffee, SkipBack, SkipForward } from "lucide-svelte";
 
   let progress = 0;
   let roundLabel = "";
@@ -22,27 +22,21 @@
   let isThemeCarouselActive = false;
   let wakeLock: any = null;
   
-  // Audio Context para generar pitidos sin archivos externos
   let audioCtx: AudioContext | null = null;
 
   const playBeep = () => {
     if (!$workoutStore.soundEnabled) return;
-    
     if (!audioCtx) audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
     
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
-
     oscillator.connect(gainNode);
     gainNode.connect(audioCtx.destination);
-
     oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // La 440Hz
-    
+    oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
     gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
     gainNode.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.01);
     gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.2);
-
     oscillator.start();
     oscillator.stop(audioCtx.currentTime + 0.2);
   };
@@ -104,7 +98,6 @@
   onMount(async () => {
     requestWakeLock();
     document.addEventListener('visibilitychange', handleVisibilityChange);
-
     if ($workoutStore.theme && $workoutStore.theme.trim() !== '') {
       images = await getImages($workoutStore.theme, 20);
     }
@@ -123,15 +116,9 @@
     return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  // Lógica de avisos sonoros: Solo en fase 'work'
   $: {
     const session = $sessionStore;
-    if (
-      session.currentState === 'work' && 
-      session.currentTime <= 3 && 
-      session.currentTime > 0 && 
-      $timerStore.state === 'running'
-    ) {
+    if (session.currentState === 'work' && session.currentTime <= 3 && session.currentTime > 0 && $timerStore.state === 'running') {
       playBeep();
     }
   }
@@ -196,21 +183,32 @@
   </div>
 
   <div class="controls-bar">
-    <button class="icon-btn secondary" on:click={resetTimer}>
-      <RotateCcw size={24} />
-    </button>
+    <div class="left-actions">
+      <button class="icon-btn secondary" on:click={resetTimer} title="Salir">
+        <ArrowLeft size={24} />
+      </button>
+    </div>
     
-    {#if $timerStore.state === "running"}
-      <button class="play-pause-btn" on:click={pauseTimer}>
-        <Pause size={32} fill="currentColor" />
-      </button>
-    {:else}
-      <button class="play-pause-btn" on:click={startTimer}>
-        <Play size={32} fill="currentColor" />
-      </button>
-    {/if}
+    <div class="center-actions">
+      {#if $timerStore.state === "running"}
+        <button class="play-pause-btn" on:click={pauseTimer}>
+          <Pause size={32} fill="currentColor" />
+        </button>
+      {:else}
+        <button class="play-pause-btn" on:click={startTimer}>
+          <Play size={32} fill="currentColor" />
+        </button>
+      {/if}
+    </div>
 
-    <div class="spacer"></div>
+    <div class="right-actions">
+      <button class="icon-btn secondary" on:click={prevRound} title="Ronda anterior">
+        <SkipBack size={24} fill="currentColor" />
+      </button>
+      <button class="icon-btn secondary" on:click={nextRound} title="Siguiente ronda">
+        <SkipForward size={24} fill="currentColor" />
+      </button>
+    </div>
   </div>
 </div>
 
@@ -318,16 +316,35 @@
   .controls-bar {
     position: relative;
     z-index: 10;
-    padding: 2.5rem 2rem;
-    display: flex;
+    padding: 2rem 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
+    gap: 1rem;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .left-actions {
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .center-actions {
+    display: flex;
     justify-content: center;
-    gap: 2rem;
+  }
+
+  .right-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
   }
 
   .play-pause-btn {
-    width: 84px;
-    height: 84px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     background: white;
     color: black;
@@ -343,8 +360,8 @@
   }
 
   .icon-btn {
-    width: 54px;
-    height: 54px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.15);
     color: white;
@@ -354,7 +371,9 @@
     justify-content: center;
     cursor: pointer;
     backdrop-filter: blur(10px);
-  }
+    transition: all 0.2s;
 
-  .spacer { width: 54px; }
+    &:active { transform: scale(0.9); }
+    &:hover { background: rgba(255, 255, 255, 0.25); }
+  }
 </style>

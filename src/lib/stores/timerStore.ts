@@ -70,3 +70,37 @@ export function resetTimer() {
   });
   appStore.set('config');
 }
+
+export function nextRound() {
+  const workout = get(workoutStore);
+  sessionStore.update(session => {
+    if (session.currentRound < workout.rounds) {
+      return {
+        currentState: 'work',
+        currentTime: workout.workTime,
+        currentRound: session.currentRound + 1
+      };
+    }
+    return session;
+  });
+}
+
+export function prevRound() {
+  const workout = get(workoutStore);
+  sessionStore.update(session => {
+    if (session.currentRound > 1) {
+      return {
+        currentState: 'work',
+        currentTime: workout.workTime,
+        currentRound: session.currentRound - 1
+      };
+    } else {
+      // Si es la primera ronda, solo reiniciamos el tiempo
+      return {
+        ...session,
+        currentState: 'work',
+        currentTime: workout.workTime
+      };
+    }
+  });
+}
